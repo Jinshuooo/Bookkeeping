@@ -76,6 +76,11 @@ export default function Auth() {
                             className="w-full px-4 py-3 rounded-xl bg-white/20 border border-white/10 text-white placeholder-white/50 focus:bg-white/30 focus:border-white/30 focus:ring-2 focus:ring-white/20 outline-none transition-all"
                             placeholder="••••••••"
                         />
+                        {!isLogin && (
+                            <p className="text-xs text-white/60 mt-2">
+                                * 注册后请前往邮箱激活账户才能登录
+                            </p>
+                        )}
                     </div>
 
                     <button
