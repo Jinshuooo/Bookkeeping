@@ -42,7 +42,7 @@ export default function Settings() {
                 </div>
 
                 <a
-                    href="https://github.com"
+                    href="https://github.com/Jinshuooo"
                     target="_blank"
                     rel="noreferrer"
                     className="p-4 flex items-center justify-between hover:bg-white/10 transition-colors cursor-pointer"
@@ -51,7 +51,7 @@ export default function Settings() {
                         <div className="p-2 bg-white/20 text-white rounded-lg">
                             <Github className="w-5 h-5" />
                         </div>
-                        <span className="font-medium text-white">开源代码</span>
+                        <span className="font-medium text-white">作者主页</span>
                     </div>
                     <span className="text-white/60 text-sm">GitHub</span>
                 </a>
