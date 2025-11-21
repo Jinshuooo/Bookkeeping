@@ -22,7 +22,13 @@ export default function Auth() {
                 if (error) throw error
                 navigate('/')
             } else {
-                const { error } = await signUp({ email, password })
+                const { error } = await signUp({
+                    email,
+                    password,
+                    options: {
+                        emailRedirectTo: window.location.origin
+                    }
+                })
                 if (error) throw error
                 navigate('/')
             }

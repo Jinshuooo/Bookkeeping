@@ -34,6 +34,7 @@ function App() {
                         <Route path="transactions" element={<Transactions />} />
                         <Route path="settings" element={<Settings />} />
                     </Route>
+                    <Route path="*" element={<Navigate to="/" replace />} />
                 </Routes>
             </BrowserRouter>
         </AuthProvider>

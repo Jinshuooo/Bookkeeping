@@ -1,5 +1,6 @@
 import { createContext, useContext, useEffect, useState } from 'react'
 import { supabase } from '../lib/supabase'
+import Loading from '../components/Loading'
 
 const AuthContext = createContext({})
 
@@ -32,7 +33,7 @@ export const AuthProvider = ({ children }) => {
 
     return (
         <AuthContext.Provider value={value}>
-            {!loading && children}
+            {loading ? <Loading /> : children}
         </AuthContext.Provider>
     )
 }
