@@ -38,7 +38,7 @@ export default function Settings() {
                         </div>
                         <span className="font-medium text-white">关于应用</span>
                     </div>
-                    <span className="text-white/60 text-sm">v1.3.0</span>
+                    <span className="text-white/60 text-sm">v1.4.1</span>
                 </div>
 
                 <a

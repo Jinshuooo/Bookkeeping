@@ -1,16 +1,16 @@
 import { useEffect, useState } from 'react'
 import { useAuth } from '../contexts/AuthContext'
 import { supabase } from '../lib/supabase'
-import { format, startOfMonth, endOfMonth, eachDayOfInterval, isSameDay, subDays } from 'date-fns'
+import { format, startOfMonth, endOfMonth, eachDayOfInterval, isSameDay, differenceInCalendarDays } from 'date-fns'
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts'
-import { ArrowUpCircle, ArrowDownCircle, Wallet, Plus } from 'lucide-react'
+import { ArrowUpCircle, ArrowDownCircle, Wallet, Plus, Calendar } from 'lucide-react'
 import { Link } from 'react-router-dom'
 
 export default function Dashboard() {
     const { user } = useAuth()
     const [transactions, setTransactions] = useState([])
     const [loading, setLoading] = useState(true)
-    const [summary, setSummary] = useState({ income: 0, expense: 0, balance: 0 })
+    const [summary, setSummary] = useState({ income: 0, expense: 0, balance: 0, dailyAvailable: 0 })
     const [chartData, setChartData] = useState([])
 
     useEffect(() => {
@@ -45,10 +45,24 @@ export default function Dashboard() {
     const calculateSummary = (data) => {
         const income = data.filter(t => t.type === 'income').reduce((acc, t) => acc + t.amount, 0)
         const expense = data.filter(t => t.type === 'expense').reduce((acc, t) => acc + t.amount, 0)
+        const balance = income - expense
+
+        // Calculate daily available
+        const now = new Date()
+        const end = endOfMonth(now)
+        // Include today in the remaining days
+        const remainingDays = differenceInCalendarDays(end, now) + 1
+
+        let dailyAvailable = null
+        if (balance > 0 && remainingDays > 0) {
+            dailyAvailable = balance / remainingDays
+        }
+
         setSummary({
             income,
             expense,
-            balance: income - expense
+            balance,
+            dailyAvailable
         })
     }
 
@@ -75,7 +89,7 @@ export default function Dashboard() {
     return (
         <div className="space-y-8">
             {/* Summary Cards */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                 <div className="bg-white/30 backdrop-blur-md border border-white/20 rounded-2xl p-6 text-white shadow-lg">
                     <div className="flex items-center gap-4 mb-4">
                         <div className="p-3 bg-white/20 rounded-xl backdrop-blur-sm shadow-inner">
@@ -84,6 +98,21 @@ export default function Dashboard() {
                         <span className="text-white/90 font-medium">本月结余</span>
                     </div>
                     <div className="text-3xl font-bold drop-shadow-sm">¥ {summary.balance.toFixed(2)}</div>
+                </div>
+
+                <div className="bg-white/30 backdrop-blur-md border border-white/20 rounded-2xl p-6 shadow-lg">
+                    <div className="flex items-center gap-4 mb-4">
+                        <div className="p-3 bg-blue-500/20 rounded-xl">
+                            <Calendar className="w-6 h-6 text-blue-200" />
+                        </div>
+                        <span className="text-white/80 font-medium">日均可用</span>
+                    </div>
+                    <div className={`text-3xl font-bold drop-shadow-sm ${summary.dailyAvailable !== null ? 'text-white' : 'text-red-200'}`}>
+                        {summary.dailyAvailable !== null
+                            ? `¥ ${summary.dailyAvailable.toFixed(2)}`
+                            : '余额不足'
+                        }
+                    </div>
                 </div>
 
                 <div className="bg-white/30 backdrop-blur-md border border-white/20 rounded-2xl p-6 shadow-lg">
