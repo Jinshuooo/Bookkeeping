@@ -67,37 +67,37 @@ export default function Transactions() {
         )
     })
 
-    if (loading) return <div className="p-8 text-center text-slate-500">加载中...</div>
+    if (loading) return <div className="p-8 text-center text-muted">加载中...</div>
 
     return (
-        <div className="space-y-6">
+        <div className="max-w-2xl mx-auto space-y-6">
             <div className="flex items-center justify-between">
-                <h2 className="text-2xl font-bold text-white drop-shadow-md">收支明细</h2>
+                <h2 className="text-2xl font-bold text-primary drop-shadow-sm">收支明细</h2>
                 <div className="relative">
-                    <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-white/60" />
+                    <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-muted" />
                     <input
                         type="text"
                         placeholder="搜索分类或备注"
                         value={searchTerm}
                         onChange={(e) => setSearchTerm(e.target.value)}
-                        className="pl-9 pr-4 py-2 rounded-xl bg-white/20 border border-white/10 text-white placeholder-white/50 focus:bg-white/30 focus:border-white/30 outline-none transition-all"
+                        className="pl-9 pr-4 py-2 rounded-xl bg-surface border border-primary/10 text-primary placeholder-muted/50 focus:bg-surface focus:border-primary/30 outline-none transition-all"
                     />
                 </div>
             </div>
 
             <div className="space-y-6">
                 {filteredDates.length === 0 ? (
-                    <div className="text-center py-12 text-white/60">
+                    <div className="text-center py-12 text-muted">
                         没有找到相关记录
                     </div>
                 ) : (
                     filteredDates.map(date => (
                         <div key={date} className="space-y-3">
                             <div className="flex items-center justify-between px-2">
-                                <h3 className="text-sm font-medium text-white/80">
+                                <h3 className="text-sm font-medium text-muted">
                                     {format(parseISO(date), 'yyyy年MM月dd日')}
                                 </h3>
-                                <div className="text-xs text-white/60">
+                                <div className="text-xs text-muted">
                                     支出: ¥{groupedTransactions[date]
                                         .filter(t => t.type === 'expense')
                                         .reduce((acc, t) => acc + t.amount, 0)
@@ -105,27 +105,27 @@ export default function Transactions() {
                                 </div>
                             </div>
 
-                            <div className="bg-white/30 backdrop-blur-md border border-white/20 rounded-2xl shadow-lg divide-y divide-white/10 overflow-hidden">
+                            <div className="bg-surface border border-primary/10 rounded-2xl shadow-sm divide-y divide-primary/5 overflow-hidden">
                                 {groupedTransactions[date].map(t => (
-                                    <div key={t.id} className="group p-4 flex items-center justify-between hover:bg-white/10 transition-colors">
+                                    <div key={t.id} className="group p-4 flex items-center justify-between hover:bg-primary/5 transition-colors">
                                         <div className="flex items-center gap-4">
-                                            <div className={`w-10 h-10 rounded-full flex items-center justify-center ${t.type === 'income' ? 'bg-green-500/20 text-green-200' : 'bg-red-500/20 text-red-200'
+                                            <div className={`w-10 h-10 rounded-full flex items-center justify-center ${t.type === 'income' ? 'bg-primary/10 text-primary' : 'bg-secondary/10 text-secondary'
                                                 }`}>
                                                 {t.type === 'income' ? <Plus className="w-5 h-5" /> : <ArrowDownCircle className="w-5 h-5" />}
                                             </div>
                                             <div>
-                                                <div className="font-medium text-white">{t.category}</div>
-                                                <div className="text-xs text-white/60">{t.note || '无备注'}</div>
+                                                <div className="font-medium text-primary">{t.category}</div>
+                                                <div className="text-xs text-muted">{t.note || '无备注'}</div>
                                             </div>
                                         </div>
                                         <div className="flex items-center gap-4">
-                                            <div className={`font-bold ${t.type === 'income' ? 'text-green-300' : 'text-white'
+                                            <div className={`font-bold ${t.type === 'income' ? 'text-primary' : 'text-secondary'
                                                 }`}>
                                                 {t.type === 'income' ? '+' : '-'} {t.amount.toFixed(2)}
                                             </div>
                                             <button
                                                 onClick={() => handleDelete(t.id)}
-                                                className="opacity-0 group-hover:opacity-100 p-2 text-white/60 hover:text-red-300 transition-all"
+                                                className="opacity-0 group-hover:opacity-100 p-2 text-muted hover:text-error transition-all"
                                                 title="删除"
                                             >
                                                 <Trash2 className="w-4 h-4" />

@@ -14,11 +14,11 @@ export default function Layout() {
     ]
 
     return (
-        <div className="min-h-screen flex flex-col md:flex-row">
-            {/* Sidebar for Desktop - Glassmorphism */}
-            <div className="hidden md:flex flex-col w-64 h-[calc(100vh-2rem)] m-4 rounded-3xl bg-white/30 backdrop-blur-md border border-white/20 shadow-xl sticky top-4">
+        <div className="min-h-screen flex flex-col md:flex-row bg-background text-primary">
+            {/* Sidebar for Desktop */}
+            <div className="hidden md:flex flex-col w-64 h-[calc(100vh-2rem)] m-4 rounded-3xl bg-surface border border-primary/10 shadow-sm sticky top-4">
                 <div className="p-6">
-                    <h1 className="text-2xl font-bold text-white drop-shadow-md">
+                    <h1 className="text-2xl font-bold text-primary">
                         极简记账
                     </h1>
                 </div>
@@ -31,8 +31,8 @@ export default function Layout() {
                                 key={item.name}
                                 to={item.href}
                                 className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 ${isActive
-                                    ? 'bg-white/40 text-white shadow-sm'
-                                    : 'text-white/70 hover:bg-white/20 hover:text-white'
+                                    ? 'bg-primary text-surface shadow-sm'
+                                    : 'text-muted hover:bg-primary/5 hover:text-primary'
                                     }`}
                             >
                                 <Icon className="w-5 h-5" />
@@ -41,10 +41,10 @@ export default function Layout() {
                         )
                     })}
                 </nav>
-                <div className="p-4 border-t border-white/10">
+                <div className="p-4 border-t border-primary/10">
                     <button
                         onClick={signOut}
-                        className="flex items-center gap-3 px-4 py-3 w-full text-white/70 hover:text-white hover:bg-white/20 rounded-xl transition-colors"
+                        className="flex items-center gap-3 px-4 py-3 w-full text-muted hover:text-error hover:bg-error/10 rounded-xl transition-colors"
                     >
                         <LogOut className="w-5 h-5" />
                         <span className="font-medium">退出登录</span>
@@ -52,12 +52,12 @@ export default function Layout() {
                 </div>
             </div>
 
-            {/* Mobile Header - Glassmorphism */}
-            <div className="md:hidden bg-white/30 backdrop-blur-md border-b border-white/20 sticky top-0 z-10 px-4 py-3 flex justify-between items-center shadow-sm">
-                <h1 className="text-xl font-bold text-white drop-shadow-md">
+            {/* Mobile Header */}
+            <div className="md:hidden bg-surface border-b border-primary/10 sticky top-0 z-10 px-4 py-3 flex justify-between items-center shadow-sm">
+                <h1 className="text-xl font-bold text-primary">
                     极简记账
                 </h1>
-                <button onClick={signOut} className="p-2 text-white/80">
+                <button onClick={signOut} className="p-2 text-muted hover:text-primary">
                     <LogOut className="w-5 h-5" />
                 </button>
             </div>
@@ -69,8 +69,8 @@ export default function Layout() {
                 </div>
             </main>
 
-            {/* Mobile Bottom Navigation - Glassmorphism */}
-            <div className="md:hidden fixed bottom-0 left-0 right-0 bg-white/30 backdrop-blur-md border-t border-white/20 px-6 py-2 z-10 safe-area-bottom">
+            {/* Mobile Bottom Navigation */}
+            <div className="md:hidden fixed bottom-0 left-0 right-0 bg-surface border-t border-primary/10 px-6 py-2 z-10 safe-area-bottom">
                 <nav className="flex justify-between items-center">
                     {navigation.map((item) => {
                         const Icon = item.icon
@@ -79,7 +79,7 @@ export default function Layout() {
                             <Link
                                 key={item.name}
                                 to={item.href}
-                                className={`flex flex-col items-center gap-1 p-2 rounded-lg transition-colors ${isActive ? 'text-white' : 'text-white/60'
+                                className={`flex flex-col items-center gap-1 p-2 rounded-lg transition-colors ${isActive ? 'text-primary' : 'text-muted'
                                     }`}
                             >
                                 <Icon className={`w-6 h-6 ${isActive ? 'fill-current/10' : ''}`} />

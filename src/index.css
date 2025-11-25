@@ -2,8 +2,36 @@
 @tailwind components;
 @tailwind utilities;
 
+:root {
+    --color-primary: #262626;
+    --color-secondary: #525252;
+    --color-accent: #171717;
+    --color-background: #e5e5e5;
+    --color-surface: #d4d4d4;
+    --color-text: #0a0a0a;
+    --color-muted: #737373;
+    --color-success: #404040;
+    --color-warning: #525252;
+    --color-error: #171717;
+    --color-info: #262626;
+    --font-heading: "Fira Code", monospace;
+    --font-body: "Inter", sans-serif;
+    --radius: 0.1rem;
+    --border-width: 2px;
+}
+
 @layer base {
     body {
-        @apply bg-gradient-to-br from-indigo-500 via-purple-500 to-pink-500 min-h-screen text-slate-900 antialiased bg-fixed;
+        @apply bg-[var(--color-background)] text-[var(--color-text)] min-h-screen antialiased;
+        font-family: var(--font-body);
+    }
+
+    h1,
+    h2,
+    h3,
+    h4,
+    h5,
+    h6 {
+        font-family: var(--font-heading);
     }
 }

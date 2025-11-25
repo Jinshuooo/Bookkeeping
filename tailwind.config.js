@@ -4,16 +4,30 @@ export default {
         "./index.html",
         "./src/**/*.{js,ts,jsx,tsx}",
     ],
+    darkMode: 'class',
     theme: {
         extend: {
             colors: {
-                primary: '#6366f1', // Indigo 500
-                secondary: '#a855f7', // Purple 500
-                background: '#f8fafc', // Slate 50
-                surface: '#ffffff',
+                primary: 'var(--color-primary)',
+                secondary: 'var(--color-secondary)',
+                accent: 'var(--color-accent)',
+                background: 'var(--color-background)',
+                surface: 'var(--color-surface)',
+                muted: 'var(--color-muted)',
+                success: 'var(--color-success)',
+                warning: 'var(--color-warning)',
+                error: 'var(--color-error)',
+                info: 'var(--color-info)',
             },
             fontFamily: {
-                sans: ['Inter', 'system-ui', 'sans-serif'],
+                sans: ['var(--font-body)', 'Inter', 'system-ui', 'sans-serif'],
+                mono: ['var(--font-heading)', 'monospace'],
+            },
+            borderRadius: {
+                DEFAULT: 'var(--radius)',
+            },
+            borderWidth: {
+                DEFAULT: 'var(--border-width)',
             }
         },
     },
