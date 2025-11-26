@@ -4,6 +4,7 @@ import { useAuth } from '../contexts/AuthContext'
 import { supabase } from '../lib/supabase'
 import { format } from 'date-fns'
 import { CATEGORIES } from '../lib/constants'
+import { Calendar, FileText } from 'lucide-react'
 
 export default function AddTransaction() {
     const { user } = useAuth()
