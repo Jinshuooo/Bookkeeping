@@ -30,7 +30,9 @@ export default function Dashboard() {
                 .eq('user_id', user.id)
                 .gte('date', start)
                 .lte('date', end)
-                .order('date', { ascending: true })
+                .lte('date', end)
+                .order('date', { ascending: false })
+                .order('created_at', { ascending: false })
 
             if (error) throw error
 
@@ -79,8 +81,8 @@ export default function Dashboard() {
             const expense = dayTransactions.filter(t => t.type === 'expense').reduce((acc, t) => acc + t.amount, 0)
             return {
                 date: format(day, 'dd'),
-                income,
-                expense
+                income: parseFloat(income.toFixed(2)),
+                expense: parseFloat(expense.toFixed(2))
             }
         })
         setChartData(chartData)
@@ -244,7 +246,7 @@ export default function Dashboard() {
                             本月还没有记录，快去<Link to="/add" className="text-primary hover:underline font-bold">记一笔</Link>吧！
                         </div>
                     ) : (
-                        transactions.slice(0, 5).reverse().map((t) => (
+                        transactions.slice(0, 5).map((t) => (
                             <div key={t.id} className="p-4 flex items-center justify-between hover:bg-primary/5 transition-colors">
                                 <div className="flex items-center gap-4">
                                     <div className={`w-10 h-10 rounded-full flex items-center justify-center ${t.type === 'income' ? 'bg-primary/10 text-primary' : 'bg-secondary/10 text-secondary'

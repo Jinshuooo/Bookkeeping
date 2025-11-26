@@ -2,7 +2,8 @@ import { useEffect, useState } from 'react'
 import { useAuth } from '../contexts/AuthContext'
 import { supabase } from '../lib/supabase'
 import { format, isSameDay, parseISO } from 'date-fns'
-import { ArrowDownCircle, Plus, Trash2, Search } from 'lucide-react'
+import { ArrowDownCircle, Plus, Trash2, Search, MoreHorizontal } from 'lucide-react'
+import { getCategoryIcon } from '../lib/constants'
 
 export default function Transactions() {
     const { user } = useAuth()
@@ -48,8 +49,26 @@ export default function Transactions() {
         }
     }
 
-    // Group transactions by date
-    const groupedTransactions = transactions.reduce((groups, transaction) => {
+    // Filter transactions first
+    const filteredTransactions = transactions.filter(t => {
+        if (!searchTerm) return true
+        return (
+            t.category.includes(searchTerm) ||
+            (t.note && t.note.includes(searchTerm))
+        )
+    })
+
+    // Calculate summary for filtered transactions
+    const totalIncome = filteredTransactions
+        .filter(t => t.type === 'income')
+        .reduce((acc, t) => acc + t.amount, 0)
+
+    const totalExpense = filteredTransactions
+        .filter(t => t.type === 'expense')
+        .reduce((acc, t) => acc + t.amount, 0)
+
+    // Group filtered transactions by date
+    const groupedTransactions = filteredTransactions.reduce((groups, transaction) => {
         const date = transaction.date
         if (!groups[date]) {
             groups[date] = []
@@ -58,14 +77,7 @@ export default function Transactions() {
         return groups
     }, {})
 
-    const filteredDates = Object.keys(groupedTransactions).filter(date => {
-        if (!searchTerm) return true
-        const dayTransactions = groupedTransactions[date]
-        return dayTransactions.some(t =>
-            t.category.includes(searchTerm) ||
-            (t.note && t.note.includes(searchTerm))
-        )
-    })
+    const filteredDates = Object.keys(groupedTransactions)
 
     if (loading) return <div className="p-8 text-center text-muted">加载中...</div>
 
@@ -84,6 +96,20 @@ export default function Transactions() {
                     />
                 </div>
             </div>
+
+            {/* Search Summary */}
+            {searchTerm && (
+                <div className="grid grid-cols-2 gap-4">
+                    <div className="bg-surface p-4 rounded-2xl border border-primary/10 shadow-sm">
+                        <div className="text-sm text-muted mb-1">搜索结果支出</div>
+                        <div className="text-xl font-bold text-secondary">¥{totalExpense.toFixed(2)}</div>
+                    </div>
+                    <div className="bg-surface p-4 rounded-2xl border border-primary/10 shadow-sm">
+                        <div className="text-sm text-muted mb-1">搜索结果收入</div>
+                        <div className="text-xl font-bold text-primary">¥{totalIncome.toFixed(2)}</div>
+                    </div>
+                </div>
+            )}
 
             <div className="space-y-6">
                 {filteredDates.length === 0 ? (
@@ -106,33 +132,36 @@ export default function Transactions() {
                             </div>
 
                             <div className="bg-surface border border-primary/10 rounded-2xl shadow-sm divide-y divide-primary/5 overflow-hidden">
-                                {groupedTransactions[date].map(t => (
-                                    <div key={t.id} className="group p-4 flex items-center justify-between hover:bg-primary/5 transition-colors">
-                                        <div className="flex items-center gap-4">
-                                            <div className={`w-10 h-10 rounded-full flex items-center justify-center ${t.type === 'income' ? 'bg-primary/10 text-primary' : 'bg-secondary/10 text-secondary'
-                                                }`}>
-                                                {t.type === 'income' ? <Plus className="w-5 h-5" /> : <ArrowDownCircle className="w-5 h-5" />}
+                                {groupedTransactions[date].map(t => {
+                                    const Icon = getCategoryIcon(t.type, t.category)
+                                    return (
+                                        <div key={t.id} className="group p-4 flex items-center justify-between hover:bg-primary/5 transition-colors">
+                                            <div className="flex items-center gap-4">
+                                                <div className={`w-10 h-10 rounded-full flex items-center justify-center ${t.type === 'income' ? 'bg-primary/10 text-primary' : 'bg-secondary/10 text-secondary'
+                                                    }`}>
+                                                    <Icon className="w-5 h-5" />
+                                                </div>
+                                                <div>
+                                                    <div className="font-medium text-primary">{t.category}</div>
+                                                    <div className="text-xs text-muted">{t.note || '无备注'}</div>
+                                                </div>
                                             </div>
-                                            <div>
-                                                <div className="font-medium text-primary">{t.category}</div>
-                                                <div className="text-xs text-muted">{t.note || '无备注'}</div>
+                                            <div className="flex items-center gap-4">
+                                                <div className={`font-bold ${t.type === 'income' ? 'text-primary' : 'text-secondary'
+                                                    }`}>
+                                                    {t.type === 'income' ? '+' : '-'} {t.amount.toFixed(2)}
+                                                </div>
+                                                <button
+                                                    onClick={() => handleDelete(t.id)}
+                                                    className="opacity-0 group-hover:opacity-100 p-2 text-muted hover:text-error transition-all"
+                                                    title="删除"
+                                                >
+                                                    <Trash2 className="w-4 h-4" />
+                                                </button>
                                             </div>
                                         </div>
-                                        <div className="flex items-center gap-4">
-                                            <div className={`font-bold ${t.type === 'income' ? 'text-primary' : 'text-secondary'
-                                                }`}>
-                                                {t.type === 'income' ? '+' : '-'} {t.amount.toFixed(2)}
-                                            </div>
-                                            <button
-                                                onClick={() => handleDelete(t.id)}
-                                                className="opacity-0 group-hover:opacity-100 p-2 text-muted hover:text-error transition-all"
-                                                title="删除"
-                                            >
-                                                <Trash2 className="w-4 h-4" />
-                                            </button>
-                                        </div>
-                                    </div>
-                                ))}
+                                    )
+                                })}
                             </div>
                         </div>
                     ))
