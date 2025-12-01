@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { useAuth } from '../contexts/AuthContext'
 import { supabase } from '../lib/supabase'
-import { format, startOfMonth, endOfMonth, eachDayOfInterval, isSameDay, differenceInCalendarDays } from 'date-fns'
+import { format, startOfMonth, endOfMonth, eachDayOfInterval, isSameDay, differenceInCalendarDays, subMonths, isSameMonth } from 'date-fns'
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts'
 import { ArrowUpCircle, ArrowDownCircle, Wallet, Plus, Calendar, TrendingUp, PieChart, Moon, Sun, Monitor } from 'lucide-react'
 import { Link } from 'react-router-dom'
@@ -14,22 +14,22 @@ export default function Dashboard() {
     const [loading, setLoading] = useState(true)
     const [summary, setSummary] = useState({ income: 0, expense: 0, balance: 0, dailyAvailable: 0 })
     const [chartData, setChartData] = useState([])
+    const [currentMonth, setCurrentMonth] = useState(new Date())
 
     useEffect(() => {
         fetchData()
-    }, [user])
+    }, [user, currentMonth])
 
     const fetchData = async () => {
         try {
-            const start = startOfMonth(new Date()).toISOString()
-            const end = endOfMonth(new Date()).toISOString()
+            const start = format(startOfMonth(currentMonth), 'yyyy-MM-dd')
+            const end = format(endOfMonth(currentMonth), 'yyyy-MM-dd')
 
             const { data, error } = await supabase
                 .from('transactions')
                 .select('*')
                 .eq('user_id', user.id)
                 .gte('date', start)
-                .lte('date', end)
                 .lte('date', end)
                 .order('date', { ascending: false })
                 .order('created_at', { ascending: false })
@@ -52,14 +52,17 @@ export default function Dashboard() {
         const balance = income - expense
 
         // Calculate daily available
-        const now = new Date()
-        const end = endOfMonth(now)
-        // Include today in the remaining days
-        const remainingDays = differenceInCalendarDays(end, now) + 1
-
         let dailyAvailable = null
-        if (balance > 0 && remainingDays > 0) {
-            dailyAvailable = balance / remainingDays
+
+        if (isSameMonth(currentMonth, new Date())) {
+            const now = new Date()
+            const end = endOfMonth(now)
+            // Include today in the remaining days
+            const remainingDays = differenceInCalendarDays(end, now) + 1
+
+            if (balance > 0 && remainingDays > 0) {
+                dailyAvailable = balance / remainingDays
+            }
         }
 
         setSummary({
@@ -71,8 +74,9 @@ export default function Dashboard() {
     }
 
     const prepareChartData = (data) => {
-        const start = startOfMonth(new Date())
-        const end = new Date() // Up to today
+        const start = startOfMonth(currentMonth)
+        const isCurrentMonth = isSameMonth(currentMonth, new Date())
+        const end = isCurrentMonth ? new Date() : endOfMonth(currentMonth)
         const days = eachDayOfInterval({ start, end })
 
         const chartData = days.map(day => {
@@ -109,7 +113,21 @@ export default function Dashboard() {
                 <div>
                     <h1 className="text-2xl font-bold text-primary">概览</h1>
                 </div>
-                <div className="flex gap-2">
+                <div className="flex gap-2 items-center">
+                    <select
+                        value={startOfMonth(currentMonth).toISOString()}
+                        onChange={(e) => setCurrentMonth(new Date(e.target.value))}
+                        className="p-2 bg-surface rounded-lg text-sm font-medium text-primary border-none outline-none cursor-pointer hover:bg-primary/5 transition-colors"
+                    >
+                        {Array.from({ length: 12 }).map((_, i) => {
+                            const date = startOfMonth(subMonths(new Date(), i))
+                            return (
+                                <option key={i} value={date.toISOString()}>
+                                    {format(date, 'yyyy年MM月')}
+                                </option>
+                            )
+                        })}
+                    </select>
                     <button
                         onClick={toggleTheme}
                         className="p-2 bg-surface rounded-lg text-muted hover:text-primary transition-colors"

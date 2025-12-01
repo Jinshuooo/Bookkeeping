@@ -252,7 +252,7 @@ export default function Settings() {
                             </div>
                             <span className="font-medium text-primary">关于应用</span>
                         </div>
-                        <span className="text-muted text-sm">v1.6.7</span>
+                        <span className="text-muted text-sm">v1.7.2</span>
                     </div>
 
                     <a

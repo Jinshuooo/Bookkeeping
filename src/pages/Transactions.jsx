@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { useAuth } from '../contexts/AuthContext'
 import { supabase } from '../lib/supabase'
-import { format, isSameDay, parseISO } from 'date-fns'
+import { format, isSameDay, parseISO, startOfMonth, subMonths, isSameMonth } from 'date-fns'
 import { ArrowDownCircle, Plus, Trash2, Search, MoreHorizontal } from 'lucide-react'
 import { getCategoryIcon } from '../lib/constants'
 
@@ -10,6 +10,7 @@ export default function Transactions() {
     const [transactions, setTransactions] = useState([])
     const [loading, setLoading] = useState(true)
     const [searchTerm, setSearchTerm] = useState('')
+    const [selectedMonth, setSelectedMonth] = useState(new Date())
 
     useEffect(() => {
         fetchTransactions()
@@ -51,6 +52,15 @@ export default function Transactions() {
 
     // Filter transactions first
     const filteredTransactions = transactions.filter(t => {
+        // 1. Filter by month
+        if (selectedMonth !== 'all') {
+            const transactionDate = parseISO(t.date)
+            if (!isSameMonth(transactionDate, selectedMonth)) {
+                return false
+            }
+        }
+
+        // 2. Filter by search term
         if (!searchTerm) return true
         return (
             t.category.includes(searchTerm) ||
@@ -85,15 +95,35 @@ export default function Transactions() {
         <div className="max-w-2xl mx-auto space-y-6">
             <div className="flex items-center justify-between">
                 <h2 className="text-2xl font-bold text-primary drop-shadow-sm">收支明细</h2>
-                <div className="relative">
-                    <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-muted" />
-                    <input
-                        type="text"
-                        placeholder="搜索分类或备注"
-                        value={searchTerm}
-                        onChange={(e) => setSearchTerm(e.target.value)}
-                        className="pl-9 pr-4 py-2 rounded-xl bg-surface border border-primary/10 text-primary placeholder-muted/50 focus:bg-surface focus:border-primary/30 outline-none transition-all"
-                    />
+                <div className="flex flex-row-reverse flex-wrap gap-2 items-center">
+                    <div className="relative">
+                        <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-muted" />
+                        <input
+                            type="text"
+                            placeholder="搜索分类或备注"
+                            value={searchTerm}
+                            onChange={(e) => setSearchTerm(e.target.value)}
+                            className="pl-9 pr-4 py-2 rounded-xl bg-surface border border-primary/10 text-primary placeholder-muted/50 focus:bg-surface focus:border-primary/30 outline-none transition-all"
+                        />
+                    </div>
+                    <select
+                        value={selectedMonth === 'all' ? 'all' : startOfMonth(selectedMonth).toISOString()}
+                        onChange={(e) => {
+                            const value = e.target.value
+                            setSelectedMonth(value === 'all' ? 'all' : new Date(value))
+                        }}
+                        className="p-2 bg-surface rounded-xl border border-primary/10 text-sm font-medium text-primary outline-none cursor-pointer hover:bg-primary/5 transition-colors"
+                    >
+                        <option value="all">全部月份</option>
+                        {Array.from({ length: 12 }).map((_, i) => {
+                            const date = startOfMonth(subMonths(new Date(), i))
+                            return (
+                                <option key={i} value={date.toISOString()}>
+                                    {format(date, 'yyyy年MM月')}
+                                </option>
+                            )
+                        })}
+                    </select>
                 </div>
             </div>
 
