@@ -4,6 +4,7 @@ import { supabase } from '../lib/supabase'
 import { format, startOfMonth, endOfMonth, eachDayOfInterval, isSameDay, differenceInCalendarDays, subMonths, isSameMonth } from 'date-fns'
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts'
 import { ArrowUpCircle, ArrowDownCircle, Wallet, Plus, Calendar, TrendingUp, PieChart, Moon, Sun, Monitor } from 'lucide-react'
+import { getCategoryIcon } from '../lib/constants'
 import { Link } from 'react-router-dom'
 import { useTheme } from '../hooks/useTheme'
 
@@ -81,7 +82,7 @@ export default function Dashboard() {
 
         const chartData = days.map(day => {
             const dayTransactions = data.filter(t => isSameDay(new Date(t.date), day))
-            const income = dayTransactions.filter(t => t.type === 'income').reduce((acc, t) => acc + t.amount, 0)
+            const income = dayTransactions.filter(t => t.type === 'income' && t.category !== '固收').reduce((acc, t) => acc + t.amount, 0)
             const expense = dayTransactions.filter(t => t.type === 'expense').reduce((acc, t) => acc + t.amount, 0)
             return {
                 date: format(day, 'dd'),
@@ -269,7 +270,10 @@ export default function Dashboard() {
                                 <div className="flex items-center gap-4">
                                     <div className={`w-10 h-10 rounded-full flex items-center justify-center ${t.type === 'income' ? 'bg-primary/10 text-primary' : 'bg-secondary/10 text-secondary'
                                         }`}>
-                                        {t.type === 'income' ? <Plus className="w-5 h-5" /> : <ArrowDownCircle className="w-5 h-5" />}
+                                        {(() => {
+                                            const Icon = getCategoryIcon(t.type, t.category)
+                                            return <Icon className="w-5 h-5" />
+                                        })()}
                                     </div>
                                     <div>
                                         <div className="font-medium text-primary">{t.category}</div>

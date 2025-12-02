@@ -19,6 +19,7 @@ export const CATEGORIES = {
         { id: 'other', name: '其他', icon: MoreHorizontal, color: 'bg-surface text-primary border-2 border-primary' },
     ],
     income: [
+        { id: 'fixed', name: '固收', icon: Briefcase, color: 'bg-surface text-primary border-2 border-primary' },
         { id: 'salary', name: '工资', icon: Wallet, color: 'bg-surface text-primary border-2 border-primary' },
         { id: 'bonus', name: '奖金', icon: DollarSign, color: 'bg-surface text-primary border-2 border-primary' },
         { id: 'investment', name: '理财', icon: TrendingUp, color: 'bg-surface text-primary border-2 border-primary' },
