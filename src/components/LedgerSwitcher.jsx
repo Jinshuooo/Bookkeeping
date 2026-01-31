@@ -41,7 +41,7 @@ export default function LedgerSwitcher() {
             await createLedger(newLedgerName)
             setNewLedgerName('')
             setShowCreate(false)
-            setIsOpen(false) // Close main dropdown too or keep open? Close is better.
+            setIsOpen(false)
         } catch (err) {
             setError(err.message)
         } finally {
@@ -57,7 +57,7 @@ export default function LedgerSwitcher() {
         try {
             await addMember(inviteEmail)
             setInviteEmail('')
-            loadMembers() // Refresh list
+            loadMembers()
             alert('邀请成功')
         } catch (err) {
             setError(err.message)
@@ -88,7 +88,7 @@ export default function LedgerSwitcher() {
         setError('')
     }
 
-    if (!currentLedger) return null
+    // REMOVED: if (!currentLedger) return null
 
     return (
         <div className="relative" ref={dropdownRef}>
@@ -97,7 +97,9 @@ export default function LedgerSwitcher() {
                 className="flex items-center gap-2 px-3 py-2 rounded-xl hover:bg-primary/5 transition-colors text-primary font-medium w-full"
             >
                 <Book className="w-4 h-4" />
-                <span className="truncate flex-1 text-left">{currentLedger.name}</span>
+                <span className="truncate flex-1 text-left">
+                    {currentLedger ? currentLedger.name : '选择/创建账本'}
+                </span>
                 <ChevronDown className={`w-4 h-4 transition-transform ${isOpen ? 'rotate-180' : ''}`} />
             </button>
 
@@ -106,20 +108,26 @@ export default function LedgerSwitcher() {
                     {!showCreate && !showMembers && (
                         <>
                             <div className="max-h-60 overflow-y-auto">
-                                {ledgers.map(ledger => (
-                                    <button
-                                        key={ledger.id}
-                                        onClick={() => {
-                                            switchLedger(ledger)
-                                            setIsOpen(false)
-                                        }}
-                                        className={`w-full text-left px-4 py-3 flex items-center justify-between hover:bg-primary/5 transition-colors ${currentLedger.id === ledger.id ? 'text-primary font-bold' : 'text-muted'
-                                            }`}
-                                    >
-                                        <span className="truncate">{ledger.name}</span>
-                                        {currentLedger.id === ledger.id && <Check className="w-4 h-4" />}
-                                    </button>
-                                ))}
+                                {ledgers.length > 0 ? (
+                                    ledgers.map(ledger => (
+                                        <button
+                                            key={ledger.id}
+                                            onClick={() => {
+                                                switchLedger(ledger)
+                                                setIsOpen(false)
+                                            }}
+                                            className={`w-full text-left px-4 py-3 flex items-center justify-between hover:bg-primary/5 transition-colors ${currentLedger?.id === ledger.id ? 'text-primary font-bold' : 'text-muted'
+                                                }`}
+                                        >
+                                            <span className="truncate">{ledger.name}</span>
+                                            {currentLedger?.id === ledger.id && <Check className="w-4 h-4" />}
+                                        </button>
+                                    ))
+                                ) : (
+                                    <div className="px-4 py-3 text-muted text-sm text-center">
+                                        暂无账本
+                                    </div>
+                                )}
                             </div>
                             <div className="border-t border-primary/10 mt-1 pt-1">
                                 <button
@@ -129,13 +137,15 @@ export default function LedgerSwitcher() {
                                     <Plus className="w-4 h-4" />
                                     创建新账本
                                 </button>
-                                <button
-                                    onClick={openMembers}
-                                    className="w-full text-left px-4 py-3 flex items-center gap-2 text-primary hover:bg-primary/5 transition-colors font-medium"
-                                >
-                                    <Users className="w-4 h-4" />
-                                    成员管理
-                                </button>
+                                {currentLedger && (
+                                    <button
+                                        onClick={openMembers}
+                                        className="w-full text-left px-4 py-3 flex items-center gap-2 text-primary hover:bg-primary/5 transition-colors font-medium"
+                                    >
+                                        <Users className="w-4 h-4" />
+                                        成员管理
+                                    </button>
+                                )}
                             </div>
                         </>
                     )}
@@ -161,7 +171,7 @@ export default function LedgerSwitcher() {
                                 <button
                                     type="submit"
                                     disabled={loading}
-                                    className="w-full bg-primary text-surface py-2 rounded-lg font-medium disabled:opacity-50"
+                                    className="w-full bg-primary hover:bg-primary/90 text-surface py-2 rounded-lg font-medium disabled:opacity-50"
                                 >
                                     {loading ? '创建中...' : '确认创建'}
                                 </button>
@@ -203,12 +213,16 @@ export default function LedgerSwitcher() {
                                 <div className="space-y-2">
                                     <p className="text-xs text-muted">现有成员</p>
                                     <div className="max-h-32 overflow-y-auto space-y-2">
-                                        {members.map((m, i) => (
-                                            <div key={i} className="flex items-center justify-between text-sm p-2 bg-background rounded-lg border border-primary/5">
-                                                <span className="truncate text-primary">{m.email}</span>
-                                                <span className="text-xs text-muted px-2 py-0.5 bg-primary/5 rounded">{m.role === 'owner' ? '以及' : m.role}</span>
-                                            </div>
-                                        ))}
+                                        {members.length > 0 ? (
+                                            members.map((m, i) => (
+                                                <div key={i} className="flex items-center justify-between text-sm p-2 bg-background rounded-lg border border-primary/5">
+                                                    <span className="truncate text-primary">{m.email}</span>
+                                                    <span className="text-xs text-muted px-2 py-0.5 bg-primary/5 rounded">{m.role === 'owner' ? '以及' : m.role}</span>
+                                                </div>
+                                            ))
+                                        ) : (
+                                            <p className="text-xs text-muted text-center py-2">加载中...</p>
+                                        )}
                                     </div>
                                 </div>
                             </div>

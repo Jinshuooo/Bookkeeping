@@ -20,7 +20,16 @@ export default function Dashboard() {
     const [currentMonth, setCurrentMonth] = useState(new Date())
 
     useEffect(() => {
-        if (user && currentLedger) fetchData()
+        if (!user) return
+
+        if (!currentLedger) {
+            setLoading(false)
+            return
+        }
+
+        // Reset loading to true when ledger changes
+        setLoading(true)
+        fetchData()
     }, [user, currentMonth, currentLedger])
 
     const fetchData = async () => {
@@ -110,12 +119,25 @@ export default function Dashboard() {
 
     if (loading) return <div className="p-8 text-center text-muted">加载中...</div>
 
+    if (!currentLedger) {
+        return (
+            <div className="p-8 text-center bg-surface rounded-2xl border border-primary/10 shadow-sm mt-8">
+                <div className="bg-primary/10 w-16 h-16 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                    <Wallet className="w-8 h-8 text-primary" />
+                </div>
+                <h2 className="text-xl font-bold text-primary mb-2">欢迎使用极简记账</h2>
+                <p className="text-muted mb-6">您还没有创建或选择任何账本。请在左侧或上方创建一个新账本以开始记账。</p>
+            </div>
+        )
+    }
+
     return (
         <div className="space-y-6">
             {/* Header */}
             <div className="flex justify-between items-center">
                 <div>
                     <h1 className="text-2xl font-bold text-primary">概览</h1>
+                    <p className="text-xs text-muted mt-1">{currentLedger.name}</p>
                 </div>
                 <div className="flex gap-2 items-center">
                     <select
