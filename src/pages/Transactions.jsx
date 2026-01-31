@@ -15,7 +15,13 @@ export default function Transactions() {
     const [selectedMonth, setSelectedMonth] = useState(new Date())
 
     useEffect(() => {
-        if (user && currentLedger) fetchTransactions()
+        if (!user) return
+        if (!currentLedger) {
+            setLoading(false)
+            return
+        }
+        setLoading(true)
+        fetchTransactions()
     }, [user, currentLedger])
 
     const fetchTransactions = async () => {
@@ -93,6 +99,14 @@ export default function Transactions() {
     const filteredDates = Object.keys(groupedTransactions)
 
     if (loading) return <div className="p-8 text-center text-muted">加载中...</div>
+
+    if (!currentLedger) {
+        return (
+            <div className="p-8 text-center text-muted min-h-[50vh] flex items-center justify-center">
+                请先创建或选择一个账本以查看明细
+            </div>
+        )
+    }
 
     return (
         <div className="max-w-2xl mx-auto space-y-6">
