@@ -1,6 +1,7 @@
 import { Outlet, Link, useLocation } from 'react-router-dom'
 import { LayoutDashboard, PlusCircle, List, Settings, LogOut } from 'lucide-react'
 import { useAuth } from '../contexts/AuthContext'
+import LedgerSwitcher from './LedgerSwitcher'
 
 export default function Layout() {
     const { signOut } = useAuth()
@@ -18,9 +19,10 @@ export default function Layout() {
             {/* Sidebar for Desktop */}
             <div className="hidden md:flex flex-col w-64 h-[calc(100vh-2rem)] m-4 rounded-3xl bg-surface border border-primary/10 shadow-sm sticky top-4">
                 <div className="p-6">
-                    <h1 className="text-2xl font-bold text-primary">
+                    <h1 className="text-2xl font-bold text-primary mb-4">
                         极简记账
                     </h1>
+                    <LedgerSwitcher />
                 </div>
                 <nav className="flex-1 px-4 space-y-2">
                     {navigation.map((item) => {
@@ -54,9 +56,9 @@ export default function Layout() {
 
             {/* Mobile Header */}
             <div className="md:hidden bg-surface border-b border-primary/10 sticky top-0 z-10 px-4 py-3 flex justify-between items-center shadow-sm">
-                <h1 className="text-xl font-bold text-primary">
-                    极简记账
-                </h1>
+                <div className="w-40">
+                    <LedgerSwitcher />
+                </div>
                 <button onClick={signOut} className="p-2 text-muted hover:text-primary">
                     <LogOut className="w-5 h-5" />
                 </button>

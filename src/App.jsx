@@ -1,5 +1,6 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
 import { AuthProvider, useAuth } from './contexts/AuthContext'
+import { LedgerProvider } from './contexts/LedgerContext'
 import Layout from './components/Layout'
 import Auth from './pages/Auth'
 
@@ -20,23 +21,25 @@ import Settings from './pages/Settings'
 function App() {
     return (
         <AuthProvider>
-            <BrowserRouter>
-                <Routes>
-                    <Route path="/auth" element={<Auth />} />
+            <LedgerProvider>
+                <BrowserRouter>
+                    <Routes>
+                        <Route path="/auth" element={<Auth />} />
 
-                    <Route path="/" element={
-                        <PrivateRoute>
-                            <Layout />
-                        </PrivateRoute>
-                    }>
-                        <Route index element={<Dashboard />} />
-                        <Route path="add" element={<AddTransaction />} />
-                        <Route path="transactions" element={<Transactions />} />
-                        <Route path="settings" element={<Settings />} />
-                    </Route>
-                    <Route path="*" element={<Navigate to="/" replace />} />
-                </Routes>
-            </BrowserRouter>
+                        <Route path="/" element={
+                            <PrivateRoute>
+                                <Layout />
+                            </PrivateRoute>
+                        }>
+                            <Route index element={<Dashboard />} />
+                            <Route path="add" element={<AddTransaction />} />
+                            <Route path="transactions" element={<Transactions />} />
+                            <Route path="settings" element={<Settings />} />
+                        </Route>
+                        <Route path="*" element={<Navigate to="/" replace />} />
+                    </Routes>
+                </BrowserRouter>
+            </LedgerProvider>
         </AuthProvider>
     )
 }

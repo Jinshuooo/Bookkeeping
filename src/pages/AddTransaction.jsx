@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../contexts/AuthContext'
+import { useLedger } from '../contexts/LedgerContext'
 import { supabase } from '../lib/supabase'
 import { format } from 'date-fns'
 import { CATEGORIES } from '../lib/constants'
@@ -8,6 +9,7 @@ import { Calendar, FileText } from 'lucide-react'
 
 export default function AddTransaction() {
     const { user } = useAuth()
+    const { currentLedger } = useLedger()
     const navigate = useNavigate()
     const [loading, setLoading] = useState(false)
     const [type, setType] = useState('expense') // 'expense' or 'income'
@@ -24,6 +26,7 @@ export default function AddTransaction() {
         try {
             const { error } = await supabase.from('transactions').insert({
                 user_id: user.id,
+                ledger_id: currentLedger.id,
                 type,
                 amount: parseFloat(amount),
                 category: category.name,

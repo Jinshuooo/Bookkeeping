@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { useAuth } from '../contexts/AuthContext'
+import { useLedger } from '../contexts/LedgerContext'
 import { supabase } from '../lib/supabase'
 import { format, isSameDay, parseISO, startOfMonth, subMonths, isSameMonth } from 'date-fns'
 import { ArrowDownCircle, Plus, Trash2, Search, MoreHorizontal } from 'lucide-react'
@@ -7,20 +8,22 @@ import { getCategoryIcon } from '../lib/constants'
 
 export default function Transactions() {
     const { user } = useAuth()
+    const { currentLedger } = useLedger()
     const [transactions, setTransactions] = useState([])
     const [loading, setLoading] = useState(true)
     const [searchTerm, setSearchTerm] = useState('')
     const [selectedMonth, setSelectedMonth] = useState(new Date())
 
     useEffect(() => {
-        fetchTransactions()
-    }, [user])
+        if (user && currentLedger) fetchTransactions()
+    }, [user, currentLedger])
 
     const fetchTransactions = async () => {
         try {
             const { data, error } = await supabase
                 .from('transactions')
                 .select('*')
+                .eq('ledger_id', currentLedger.id)
                 .eq('user_id', user.id)
                 .order('date', { ascending: false })
                 .order('created_at', { ascending: false })

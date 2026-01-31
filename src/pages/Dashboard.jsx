@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { useAuth } from '../contexts/AuthContext'
+import { useLedger } from '../contexts/LedgerContext'
 import { supabase } from '../lib/supabase'
 import { format, startOfMonth, endOfMonth, eachDayOfInterval, isSameDay, differenceInCalendarDays, subMonths, isSameMonth } from 'date-fns'
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts'
@@ -10,6 +11,7 @@ import { useTheme } from '../hooks/useTheme'
 
 export default function Dashboard() {
     const { user } = useAuth()
+    const { currentLedger } = useLedger()
     const { theme, setTheme } = useTheme()
     const [transactions, setTransactions] = useState([])
     const [loading, setLoading] = useState(true)
@@ -18,8 +20,8 @@ export default function Dashboard() {
     const [currentMonth, setCurrentMonth] = useState(new Date())
 
     useEffect(() => {
-        fetchData()
-    }, [user, currentMonth])
+        if (user && currentLedger) fetchData()
+    }, [user, currentMonth, currentLedger])
 
     const fetchData = async () => {
         try {
@@ -29,6 +31,7 @@ export default function Dashboard() {
             const { data, error } = await supabase
                 .from('transactions')
                 .select('*')
+                .eq('ledger_id', currentLedger.id)
                 .eq('user_id', user.id)
                 .gte('date', start)
                 .lte('date', end)
