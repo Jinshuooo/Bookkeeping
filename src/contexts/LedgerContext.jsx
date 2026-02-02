@@ -136,12 +136,32 @@ export const LedgerProvider = ({ children }) => {
             return members.map(m => {
                 const profile = profiles.find(p => p.id === m.user_id)
                 return {
+                    user_id: m.user_id,
                     role: m.role,
                     email: profile?.email || '未知用户'
                 }
             })
         } catch (error) {
             console.error('Error in getMembers:', error)
+            throw error
+        }
+    }
+
+    const removeMember = async (userId) => {
+        if (!currentLedger) return
+
+        try {
+            const { error } = await supabase
+                .from('ledger_members')
+                .delete()
+                .eq('ledger_id', currentLedger.id)
+                .eq('user_id', userId)
+
+            if (error) throw error
+
+            return true
+        } catch (error) {
+            console.error('Error removing member:', error)
             throw error
         }
     }
@@ -153,7 +173,8 @@ export const LedgerProvider = ({ children }) => {
         createLedger,
         switchLedger,
         addMember,
-        getMembers
+        getMembers,
+        removeMember
     }
 
     return (

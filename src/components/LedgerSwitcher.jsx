@@ -1,10 +1,10 @@
 import { useState, useRef, useEffect } from 'react'
 import { useLedger } from '../contexts/LedgerContext'
 import { useAuth } from '../contexts/AuthContext'
-import { ChevronDown, Plus, Users, Check, X, Book } from 'lucide-react'
+import { ChevronDown, Plus, Users, Check, X, Book, Trash2 } from 'lucide-react'
 
 export default function LedgerSwitcher() {
-    const { ledgers, currentLedger, switchLedger, createLedger, addMember, getMembers } = useLedger()
+    const { ledgers, currentLedger, switchLedger, createLedger, addMember, getMembers, removeMember } = useLedger()
     const { user } = useAuth()
 
     const [isOpen, setIsOpen] = useState(false)
@@ -73,6 +73,21 @@ export default function LedgerSwitcher() {
         } catch (err) {
             console.error('加载成员失败:', err)
             setError('加载成员失败: ' + err.message)
+        }
+    }
+
+    const handleRemoveMember = async (userId) => {
+        if (!confirm('确定要移除该成员吗？')) return
+        setLoading(true)
+        setError('')
+        try {
+            await removeMember(userId)
+            await loadMembers()
+            alert('移除成功')
+        } catch (err) {
+            setError('移除失败: ' + err.message)
+        } finally {
+            setLoading(false)
         }
     }
 
@@ -216,9 +231,23 @@ export default function LedgerSwitcher() {
                                     <div className="max-h-32 overflow-y-auto space-y-2">
                                         {members.length > 0 ? (
                                             members.map((m, i) => (
-                                                <div key={i} className="flex items-center justify-between text-sm p-2 bg-background rounded-lg border border-primary/5">
-                                                    <span className="truncate text-primary">{m.email}</span>
-                                                    <span className="text-xs text-muted px-2 py-0.5 bg-primary/5 rounded">{m.role === 'owner' ? '以及' : m.role}</span>
+                                                <div key={i} className="flex items-center justify-between text-sm p-2 bg-background rounded-lg border border-primary/5 group">
+                                                    <div className="flex items-center gap-2 flex-1 min-w-0">
+                                                        <span className="truncate text-primary">{m.email}</span>
+                                                        <span className="text-xs text-muted px-2 py-0.5 bg-primary/5 rounded whitespace-nowrap">
+                                                            {m.role === 'owner' ? '所有者' : m.role === 'admin' ? '管理员' : '成员'}
+                                                        </span>
+                                                    </div>
+                                                    {m.role !== 'owner' && (
+                                                        <button
+                                                            onClick={() => handleRemoveMember(m.user_id)}
+                                                            disabled={loading}
+                                                            className="opacity-0 group-hover:opacity-100 p-1 text-muted hover:text-error transition-all disabled:opacity-50"
+                                                            title="移除成员"
+                                                        >
+                                                            <Trash2 className="w-3.5 h-3.5" />
+                                                        </button>
+                                                    )}
                                                 </div>
                                             ))
                                         ) : (
