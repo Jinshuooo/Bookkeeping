@@ -34,9 +34,10 @@ export const LedgerProvider = ({ children }) => {
             if (error) throw error
 
             if (data.length === 0) {
-                // If no ledger exists, create a default one
-                await createLedger('默认账本')
-                return // createLedger will trigger fetchLedgers again hopefully or we just set it there
+                // If no ledger exists, we wait or show empty state. 
+                // The backend trigger should have created one for new users. 
+                // However, for existing users without ledgers, they might need manual creation via UI.
+                setLedgers([])
             } else {
                 setLedgers(data)
                 // Restore selection from local storage or default to first

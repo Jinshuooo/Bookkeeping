@@ -30,7 +30,8 @@ export default function Transactions() {
                 .from('transactions')
                 .select('*')
                 .eq('ledger_id', currentLedger.id)
-                .eq('user_id', user.id)
+                .eq('ledger_id', currentLedger.id)
+                // REMOVED: .eq('user_id', user.id)
                 .order('date', { ascending: false })
                 .order('created_at', { ascending: false })
 

@@ -164,13 +164,28 @@ create policy "Users can delete transactions in their ledgers" on public.transac
 -- 4. Triggers & RPCs
 -- ==========================================
 
--- Profile Creation Trigger
+-- Profile Creation Trigger (Enhanced)
 create or replace function public.handle_new_user()
 returns trigger as $$
+declare
+  new_ledger_id uuid;
 begin
+  -- 1. Create Profile
   insert into public.profiles (id, email)
   values (new.id, new.email)
   on conflict (id) do nothing;
+
+  -- 2. Create Default Ledger (only if none exists)
+  if not exists (select 1 from public.ledgers where created_by = new.id) then
+      insert into public.ledgers (name, created_by)
+      values ('默认账本', new.id)
+      returning id into new_ledger_id;
+
+      -- 3. Add Member (Owner)
+      insert into public.ledger_members (ledger_id, user_id, role)
+      values (new_ledger_id, new.id, 'owner');
+  end if;
+
   return new;
 end;
 $$ language plpgsql security definer;
@@ -204,3 +219,13 @@ begin
   return row_to_json(new_ledger_record);
 end;
 $$ language plpgsql security definer;
+
+-- ==========================================
+-- 5. Data Backfill (One-off)
+-- ==========================================
+
+-- Backfill profiles for existing users
+insert into public.profiles (id, email)
+select id, email from auth.users
+on conflict (id) do nothing;
+

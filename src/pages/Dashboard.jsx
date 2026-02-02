@@ -41,7 +41,8 @@ export default function Dashboard() {
                 .from('transactions')
                 .select('*')
                 .eq('ledger_id', currentLedger.id)
-                .eq('user_id', user.id)
+                .eq('ledger_id', currentLedger.id)
+                // REMOVED: .eq('user_id', user.id) -> allow seeing all members' transactions
                 .gte('date', start)
                 .lte('date', end)
                 .order('date', { ascending: false })
