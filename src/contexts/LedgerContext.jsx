@@ -58,35 +58,14 @@ export const LedgerProvider = ({ children }) => {
 
     const createLedger = async (name) => {
         try {
-            // 1. Create Ledger
-            const { data: ledger, error: ledgerError } = await supabase
-                .from('ledgers')
-                .insert([{ name, created_by: user.id }])
-                .select()
-                .single()
+            const { data, error } = await supabase
+                .rpc('create_ledger', { name })
 
-            if (ledgerError) throw ledgerError
+            if (error) throw error
 
-            // 2. Add Member (Owner) - This might be handled by RLS/Trigger but let's be explicit if needed.
-            // My SQL policy allows insert to 'ledger_members' if it's the first one.
-            // Wait, my SQL said: "Owners can add members". 
-            // And "Allow self-insert if it's the first member".
-
-            const { error: memberError } = await supabase
-                .from('ledger_members')
-                .insert([{ ledger_id: ledger.id, user_id: user.id, role: 'owner' }])
-
-            if (memberError) {
-                // If member creation fails, maybe we should cleanup the ledger? 
-                // Or maybe the Trigger handled it? I didn't verify a trigger for this in SQL. 
-                // I rely on client call.
-                console.error('Error adding member:', memberError)
-                throw memberError
-            }
-
-            // Refresh
-            await fetchLedgers() // simpler than updating state manually
-            return ledger
+            // Refresh ledgers list
+            await fetchLedgers()
+            return data
         } catch (error) {
             console.error('Error creating ledger:', error)
             throw error

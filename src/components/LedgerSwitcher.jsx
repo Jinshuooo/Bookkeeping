@@ -197,12 +197,12 @@ export default function LedgerSwitcher() {
                                             placeholder="对方邮箱"
                                             value={inviteEmail}
                                             onChange={(e) => setInviteEmail(e.target.value)}
-                                            className="flex-1 px-3 py-2 rounded-lg bg-background border border-primary/10 outline-none focus:border-primary/30 text-sm"
+                                            className="flex-1 min-w-0 px-3 py-2 rounded-lg bg-background border border-primary/10 outline-none focus:border-primary/30 text-sm"
                                         />
                                         <button
                                             type="submit"
                                             disabled={loading}
-                                            className="bg-primary/10 text-primary px-3 py-2 rounded-lg font-medium text-sm hover:bg-primary/20 disabled:opacity-50"
+                                            className="bg-primary/10 text-primary px-3 py-2 rounded-lg font-medium text-sm hover:bg-primary/20 disabled:opacity-50 whitespace-nowrap"
                                         >
                                             邀请
                                         </button>
