@@ -113,19 +113,37 @@ export const LedgerProvider = ({ children }) => {
 
     const getMembers = async () => {
         if (!currentLedger) return []
-        const { data, error } = await supabase
-            .from('ledger_members')
-            .select(`
-                role,
-                profiles:user_id (email)
-            `)
-            .eq('ledger_id', currentLedger.id)
 
-        if (error) throw error
-        return data.map(m => ({
-            role: m.role,
-            email: m.profiles.email
-        }))
+        try {
+            // Get ledger members
+            const { data: members, error: membersError } = await supabase
+                .from('ledger_members')
+                .select('user_id, role')
+                .eq('ledger_id', currentLedger.id)
+
+            if (membersError) throw membersError
+
+            // Get profiles for these users
+            const userIds = members.map(m => m.user_id)
+            const { data: profiles, error: profilesError } = await supabase
+                .from('profiles')
+                .select('id, email')
+                .in('id', userIds)
+
+            if (profilesError) throw profilesError
+
+            // Combine the data
+            return members.map(m => {
+                const profile = profiles.find(p => p.id === m.user_id)
+                return {
+                    role: m.role,
+                    email: profile?.email || '未知用户'
+                }
+            })
+        } catch (error) {
+            console.error('Error in getMembers:', error)
+            throw error
+        }
     }
 
     const value = {

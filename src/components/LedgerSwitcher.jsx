@@ -71,7 +71,8 @@ export default function LedgerSwitcher() {
             const data = await getMembers()
             setMembers(data)
         } catch (err) {
-            console.error(err)
+            console.error('加载成员失败:', err)
+            setError('加载成员失败: ' + err.message)
         }
     }
 
