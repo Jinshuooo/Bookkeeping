@@ -181,7 +181,10 @@ create trigger on_auth_user_created
   for each row execute procedure public.handle_new_user();
 
 -- Atomic Ledger Creation RPC
-create or replace function public.create_ledger(name text)
+-- Drop old signature if exists to allow cleaner rename
+drop function if exists public.create_ledger(text);
+
+create or replace function public.create_ledger(new_ledger_name text)
 returns json as $$
 declare
   new_ledger_id uuid;
@@ -189,7 +192,7 @@ declare
 begin
   -- 1. Insert Ledger
   insert into public.ledgers (name, created_by)
-  values (name, auth.uid())
+  values (new_ledger_name, auth.uid())
   returning id, name, created_at, created_by into new_ledger_record;
   
   new_ledger_id := new_ledger_record.id;

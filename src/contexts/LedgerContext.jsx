@@ -59,7 +59,7 @@ export const LedgerProvider = ({ children }) => {
     const createLedger = async (name) => {
         try {
             const { data, error } = await supabase
-                .rpc('create_ledger', { name })
+                .rpc('create_ledger', { new_ledger_name: name })
 
             if (error) throw error
 
