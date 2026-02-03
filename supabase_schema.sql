@@ -137,6 +137,16 @@ create policy "Owners can add members" on public.ledger_members for insert
     )
   );
 
+drop policy if exists "Owners can remove members" on public.ledger_members;
+create policy "Owners can remove members" on public.ledger_members for delete
+  using (
+    -- Must be owner or admin of the ledger
+    public.get_my_role(ledger_id) in ('owner', 'admin')
+    AND
+    -- Cannot remove yourself
+    user_id != auth.uid()
+  );
+
 -- Transactions
 drop policy if exists "Users can view their own transactions" on public.transactions;
 drop policy if exists "Users can insert their own transactions" on public.transactions;

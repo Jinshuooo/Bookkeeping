@@ -1,7 +1,7 @@
 {
-  "name": "Bookkeeping",
-  "private": true,
-  "version": "0.0.0",
+  "name": "bookkeeping",
+  "version": "1.0.0",
+  "description": "A modern personal finance management system built with React and Supabase",
   "type": "module",
   "scripts": {
     "dev": "vite",
@@ -27,5 +27,20 @@
     "tailwindcss": "^3.4.1",
     "typescript": "^5.2.2",
     "vite": "^5.1.4"
-  }
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Jinshuooo/Bookkeeping.git"
+  },
+  "keywords": [
+    "bookkeeping",
+    "finance",
+    "personal-finance",
+    "react",
+    "supabase",
+    "cloudflare-pages",
+    "vite"
+  ],
+  "author": "Jinshuooo",
+  "license": "MIT"
 }
