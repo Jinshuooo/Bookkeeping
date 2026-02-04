@@ -1,31 +1,48 @@
-# 📊 记账本 Bookkeeping
+# 极简记账 Bookkeeping
 
-> 一个现代化的个人财务管理系统，支持多账本管理和团队协作
+> 一个风格简洁的个人财务管理系统，支持多账本管理和团队协作，一切数据均掌握在自己手中！
 
 [English](#english) | [中文](#chinese)
 
 ---
 
-## 🌟 特性
+## 预览
 
-- 💰 **收支管理** - 轻松记录和分类您的收入与支出
-- 📊 **数据可视化** - 直观的图表展示财务状况
-- 📚 **多账本支持** - 为不同用途创建独立账本（工作、家庭、旅行等）
-- 👥 **协作记账** - 邀请家人或朋友共同管理账本
-- 📤 **数据导出** - 导出 Excel 进行深度分析
-- 🔐 **安全可靠** - Supabase 提供企业级数据安全
-- ☁️ **实时同步** - 跨设备无缝同步数据
-- 🚀 **一键部署** - 免费部署到 Cloudflare Pages
+<p align="center">
+  <img src="public/gailan.png" alt="概览图片" width="39.55%" />
+  <img src="public/mingxi.png" alt="明细图片" width="39.55%" />
+</p>
+<p align="center" style="color: #888; font-size: 14px; margin-bottom: 20px;">
+  手机预览效果
+</p>
 
-## 🎯 快速开始
+<p align="center">
+  <img src="public/gailan2.png" alt="概览图片2" width="80%" />
+</p>
+<p align="center" style="color: #888; font-size: 14px;">
+  网页预览效果
+</p>
+
+## 特点介绍
+
+- **一键部署** - 免费部署到 Cloudflare Pages
+- **收支管理** - 轻松记录和分类您的收入与支出
+- **数据可视化** - 直观的图表展示财务状况
+- **多账本支持** - 为不同用途创建独立账本（工作、家庭、旅行等）
+- **协作记账** - 邀请家人或朋友共同管理账本
+- **数据导出** - 导出 Excel 进行深度分析
+- **安全可靠** - Supabase 提供企业级数据安全
+- **实时同步** - 跨设备无缝同步数据
+
+## 快速开始
 
 只需三步，即可拥有自己的记账系统！
 
-### 1️⃣ Fork 本仓库
+### 1. Fork 本仓库
 
 点击 GitHub 页面右上角的 **Fork** 按钮，将项目复制到您的账号下。
 
-### 2️⃣ 配置 Supabase
+### 2. 配置 Supabase
 
 1. 访问 [supabase.com](https://supabase.com/) 并创建免费账号
 2. 创建新项目（选择离您最近的区域）
@@ -40,7 +57,7 @@
    - 复制 `Project URL`（形如：`https://xxxxx.supabase.co`）
    - 复制 `anon public` key（以 `eyJ` 开头的长字符串）
 
-### 3️⃣ 部署到 Cloudflare Pages
+### 3. 部署到 Cloudflare Pages
 
 1. 访问 [Cloudflare Dashboard](https://dash.cloudflare.com/)（需要注册，完全免费）
 2. 选择 **Workers & Pages** > **Create application** > **Pages** > **Connect to Git**
@@ -59,7 +76,7 @@
 
 等待 1-2 分钟，您的记账系统就部署完成了！🎉
 
-## 💻 本地开发（可选）
+## 本地开发（可选）
 
 如果您想在本地进行开发或自定义：
 
@@ -81,7 +98,7 @@ npm run dev
 
 访问 http://localhost:5173 即可查看效果。
 
-## 📖 使用说明
+## 使用说明
 
 1. **注册账号** - 使用邮箱注册并验证
 2. **创建交易** - 点击 "+" 添加收入或支出
@@ -89,7 +106,7 @@ npm run dev
 4. **管理账本** - 创建多个账本，如"日常开销"、"投资理财"等
 5. **邀请协作** - 在设置中通过邮箱邀请成员
 
-## 🛠️ 技术栈
+## 技术栈
 
 - **前端框架**: React 18 + Vite
 - **UI 样式**: Tailwind CSS
@@ -99,7 +116,7 @@ npm run dev
 - **图表**: Recharts
 - **图标**: Lucide React
 
-## ❓ 常见问题
+## 常见问题
 
 **Q: Supabase 免费额度够用吗？**  
 A: 对于个人使用完全够用。免费版提供 500MB 数据库、5GB 文件存储和 50,000 月活跃用户。
@@ -116,50 +133,67 @@ A: 当然可以！这是开源项目，您可以自由修改和定制。
 **Q: 如何更新到最新版本？**  
 A: 在您 Fork 的仓库页面，点击 **Sync fork** 即可同步上游更新。
 
-## 🤝 贡献
+## 贡献
 
 欢迎贡献代码！请查看 [CONTRIBUTING.md](CONTRIBUTING.md) 了解详情。
 
-## 📄 许可证
+## 许可证
 
 本项目采用 [MIT 许可证](LICENSE) 开源。
 
-## 👨‍💻 作者
+## 作者
 
 **Jinshuooo**
 - GitHub: [@Jinshuooo](https://github.com/Jinshuooo)
 
-## 🐛 问题反馈
+## 问题反馈
 
 遇到问题？请[提交 Issue](https://github.com/Jinshuooo/Bookkeeping/issues)
 
 ---
 
 <a name="english"></a>
-# 📊 Bookkeeping
+# Bookkeeping
 
-> A modern personal finance management system with multi-ledger support and team collaboration
+> A minimalist personal finance management system supporting multi-ledger management and team collaboration, keeping all data in your own hands!
 
-## 🌟 Features
+## Preview
 
-- 💰 **Transaction Management** - Easy tracking of income and expenses
-- 📊 **Data Visualization** - Intuitive charts for financial insights
-- 📚 **Multi-Ledger Support** - Create separate ledgers for different purposes
-- 👥 **Collaboration** - Invite family or friends to manage shared ledgers
-- 📤 **Data Export** - Export to Excel for deeper analysis
-- 🔐 **Secure** - Enterprise-grade security powered by Supabase
-- ☁️ **Real-time Sync** - Seamless data synchronization across devices
-- 🚀 **One-Click Deploy** - Free deployment to Cloudflare Pages
+<p align="center">
+  <img src="public/gailan.png" alt="Overview" width="39.55%" />
+  <img src="public/mingxi.png" alt="Details" width="39.55%" />
+</p>
+<p align="center" style="color: #888; font-size: 14px; margin-bottom: 20px;">
+  Mobile Preview
+</p>
 
-## 🎯 Quick Start
+<p align="center">
+  <img src="public/gailan2.png" alt="Overview 2" width="80%" />
+</p>
+<p align="center" style="color: #888; font-size: 14px;">
+  Web Preview
+</p>
+
+## Features
+
+- **Transaction Management** - Easy tracking of income and expenses
+- **Data Visualization** - Intuitive charts for financial insights
+- **Multi-Ledger Support** - Create separate ledgers for different purposes
+- **Collaboration** - Invite family or friends to manage shared ledgers
+- **Data Export** - Export to Excel for deeper analysis
+- **Secure** - Enterprise-grade security powered by Supabase
+- **Real-time Sync** - Seamless data synchronization across devices
+- **One-Click Deploy** - Free deployment to Cloudflare Pages
+
+## Quick Start
 
 Get your own bookkeeping system in just 3 steps!
 
-### 1️⃣ Fork This Repository
+### 1. Fork This Repository
 
 Click the **Fork** button at the top right of this page.
 
-### 2️⃣ Set Up Supabase
+### 2. Set Up Supabase
 
 1. Visit [supabase.com](https://supabase.com/) and create a free account
 2. Create a new project (choose the region closest to you)
@@ -174,7 +208,7 @@ Click the **Fork** button at the top right of this page.
    - Copy the `Project URL` (like: `https://xxxxx.supabase.co`)
    - Copy the `anon public` key (long string starting with `eyJ`)
 
-### 3️⃣ Deploy to Cloudflare Pages
+### 3. Deploy to Cloudflare Pages
 
 1. Visit [Cloudflare Dashboard](https://dash.cloudflare.com/) (sign up for free)
 2. Go to **Workers & Pages** > **Create application** > **Pages** > **Connect to Git**
@@ -193,7 +227,7 @@ Click the **Fork** button at the top right of this page.
 
 Wait 1-2 minutes, and your bookkeeping system is live! 🎉
 
-## 💻 Local Development (Optional)
+## Local Development (Optional)
 
 If you want to develop locally or customize:
 
@@ -215,7 +249,7 @@ npm run dev
 
 Visit http://localhost:5173 to see your app.
 
-## 📖 Usage
+## Usage
 
 1. **Sign Up** - Register with your email
 2. **Add Transactions** - Click "+" to add income or expenses
@@ -223,7 +257,7 @@ Visit http://localhost:5173 to see your app.
 4. **Manage Ledgers** - Create multiple ledgers like "Daily", "Investment", etc.
 5. **Invite Members** - Share ledgers via email in settings
 
-## 🛠️ Tech Stack
+## Tech Stack
 
 - **Frontend**: React 18 + Vite
 - **Styling**: Tailwind CSS
@@ -233,7 +267,7 @@ Visit http://localhost:5173 to see your app.
 - **Charts**: Recharts
 - **Icons**: Lucide React
 
-## ❓ FAQ
+## FAQ
 
 **Q: Is Supabase free tier enough?**  
 A: Yes, perfect for personal use. Free tier includes 500MB database, 5GB storage, and 50,000 MAU.
@@ -250,20 +284,20 @@ A: Absolutely! This is open source - customize it as you like.
 **Q: How to update to the latest version?**  
 A: Click **Sync fork** on your forked repository page.
 
-## 🤝 Contributing
+## Contributing
 
 Contributions are welcome! See [CONTRIBUTING.md](CONTRIBUTING.md) for details.
 
-## 📄 License
+## License
 
 This project is licensed under the [MIT License](LICENSE).
 
-## 👨‍💻 Author
+## Author
 
 **Jinshuooo**
 - GitHub: [@Jinshuooo](https://github.com/Jinshuooo)
 
-## 🐛 Issues
+## Issues
 
 Found a bug? Please [open an issue](https://github.com/Jinshuooo/Bookkeeping/issues)
 
