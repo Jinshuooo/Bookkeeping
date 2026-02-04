@@ -9,8 +9,8 @@
 ## 预览
 
 <p align="center">
-  <img src="public/gailan.Png" alt="概览图片" width="39.55%" />
-  <img src="public/mingxi.Png" alt="明细图片" width="39.55%" />
+  <img src="public/gailan.PNG" alt="概览图片" width="39.55%" />
+  <img src="public/mingxi.PNG" alt="明细图片" width="39.55%" />
 </p>
 <p align="center" style="color: #888; font-size: 14px; margin-bottom: 20px;">
   手机预览效果
@@ -161,8 +161,8 @@ A: 在您 Fork 的仓库页面，点击 **Sync fork** 即可同步上游更新�
 ## Preview
 
 <p align="center">
-  <img src="public/gailan.Png" alt="Overview" width="39.55%" />
-  <img src="public/mingxi.Png" alt="Details" width="39.55%" />
+  <img src="public/gailan.PNG" alt="Overview" width="39.55%" />
+  <img src="public/mingxi.PNG" alt="Details" width="39.55%" />
 </p>
 <p align="center" style="color: #888; font-size: 14px; margin-bottom: 20px;">
   Mobile Preview
