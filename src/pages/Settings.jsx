@@ -275,7 +275,7 @@ export default function Settings() {
             {/* Coming Soon */}
             <div className="text-center pt-8">
                 <p className="text-muted/50 text-sm">
-                    更多功能（自定义分类、多账本）正在开发中...
+                    更多功能（自定义分类...）正在开发中...
                 </p>
             </div>
         </div>
