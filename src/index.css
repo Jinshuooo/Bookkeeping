@@ -20,6 +20,20 @@
     --border-width: 2px;
 }
 
+.dark {
+    --color-primary: #e5e5e5;
+    --color-secondary: #a3a3a3;
+    --color-accent: #fafafa;
+    --color-background: #1c1c1c;
+    --color-surface: #171717;
+    --color-text: #e5e5e5;
+    --color-muted: #a3a3a3;
+    --color-success: #4ade80;
+    --color-warning: #facc15;
+    --color-error: #f87171;
+    --color-info: #e5e5e5;
+}
+
 @layer base {
     body {
         @apply bg-[var(--color-background)] text-[var(--color-text)] min-h-screen antialiased;
