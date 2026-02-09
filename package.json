@@ -1,6 +1,6 @@
 {
   "name": "bookkeeping",
-  "version": "1.0.0",
+  "version": "1.2.1",
   "description": "A modern personal finance management system built with React and Supabase",
   "type": "module",
   "scripts": {
