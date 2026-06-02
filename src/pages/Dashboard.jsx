@@ -5,7 +5,8 @@ import { supabase } from '../lib/supabase'
 import { format, startOfMonth, endOfMonth, eachDayOfInterval, isSameDay, differenceInCalendarDays, subMonths, isSameMonth } from 'date-fns'
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts'
 import { ArrowUpCircle, ArrowDownCircle, Wallet, Plus, Calendar, TrendingUp, PieChart, Moon, Sun, Monitor } from 'lucide-react'
-import { getCategoryIcon } from '../lib/constants'
+import { getIconComponent, getCategoryIcon } from '../lib/constants'
+import { useCategories } from '../hooks/useCategories'
 import { Link } from 'react-router-dom'
 import { useTheme } from '../hooks/useTheme'
 
@@ -13,6 +14,7 @@ export default function Dashboard() {
     const { user } = useAuth()
     const { currentLedger } = useLedger()
     const { theme, setTheme } = useTheme()
+    const { categories } = useCategories()
     const [transactions, setTransactions] = useState([])
     const [loading, setLoading] = useState(true)
     const [summary, setSummary] = useState({ income: 0, expense: 0, balance: 0, dailyAvailable: 0 })
@@ -297,7 +299,7 @@ export default function Dashboard() {
                                     <div className={`w-10 h-10 rounded-full flex items-center justify-center ${t.type === 'income' ? 'bg-primary/10 text-primary' : 'bg-secondary/10 text-secondary'
                                         }`}>
                                         {(() => {
-                                            const Icon = getCategoryIcon(t.type, t.category)
+                                            const Icon = getCategoryIcon(t.type, t.category, categories)
                                             return <Icon className="w-5 h-5" />
                                         })()}
                                     </div>

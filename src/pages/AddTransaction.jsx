@@ -4,19 +4,23 @@ import { useAuth } from '../contexts/AuthContext'
 import { useLedger } from '../contexts/LedgerContext'
 import { supabase } from '../lib/supabase'
 import { format } from 'date-fns'
-import { CATEGORIES } from '../lib/constants'
-import { Calendar, FileText } from 'lucide-react'
+import { useCategories } from '../hooks/useCategories'
+import { getIconComponent } from '../lib/constants'
+import { Calendar, FileText, Loader2 } from 'lucide-react'
 
 export default function AddTransaction() {
     const { user } = useAuth()
     const { currentLedger } = useLedger()
     const navigate = useNavigate()
     const [loading, setLoading] = useState(false)
-    const [type, setType] = useState('expense') // 'expense' or 'income'
+    const [type, setType] = useState('expense')
     const [amount, setAmount] = useState('')
     const [category, setCategory] = useState(null)
     const [date, setDate] = useState(format(new Date(), 'yyyy-MM-dd'))
     const [note, setNote] = useState('')
+
+    const { categories, loading: categoriesLoading } = useCategories()
+    const filteredCategories = categories.filter(c => c.type === type)
 
     const handleSubmit = async (e) => {
         e.preventDefault()
@@ -92,30 +96,50 @@ export default function AddTransaction() {
                     {/* Category Grid */}
                     <div>
                         <label className="block text-sm font-medium text-muted mb-4">分类</label>
-                        <div className="grid grid-cols-4 sm:grid-cols-5 gap-4">
-                            {CATEGORIES[type].map((cat) => {
-                                const Icon = cat.icon
-                                const isSelected = category?.id === cat.id
-                                return (
-                                    <button
-                                        key={cat.id}
-                                        type="button"
-                                        onClick={() => setCategory(cat)}
-                                        className={`flex flex-col items-center gap-2 p-2 rounded-xl transition-all ${isSelected ? 'bg-primary/10 scale-105 shadow-inner' : 'hover:bg-primary/5'
-                                            }`}
-                                    >
-                                        <div className={`w-12 h-12 rounded-full flex items-center justify-center transition-transform ${isSelected ? 'bg-primary text-surface' : 'bg-surface text-muted border-2 border-muted'
-                                            }`}>
-                                            <Icon className="w-6 h-6" />
-                                        </div>
-                                        <span className={`text-xs font-medium ${isSelected ? 'text-primary' : 'text-muted'
-                                            }`}>
-                                            {cat.name}
-                                        </span>
-                                    </button>
-                                )
-                            })}
-                        </div>
+                        {categoriesLoading ? (
+                            <div className="flex items-center justify-center py-8">
+                                <Loader2 className="w-6 h-6 animate-spin text-muted" />
+                            </div>
+                        ) : filteredCategories.length === 0 ? (
+                            <div className="text-center py-8 text-muted text-sm">
+                                暂无分类，请前往
+                                <button
+                                    type="button"
+                                    onClick={() => navigate('/settings')}
+                                    className="text-primary hover:underline font-medium mx-1"
+                                >
+                                    设置 → 分类管理
+                                </button>
+                                添加
+                            </div>
+                        ) : (
+                            <div className="grid grid-cols-4 sm:grid-cols-5 gap-4">
+                                {filteredCategories.map((cat) => {
+                                    const Icon = getIconComponent(cat.icon)
+                                    const isSelected = category?.id === cat.id
+                                    return (
+                                        <button
+                                            key={cat.id}
+                                            type="button"
+                                            onClick={() => setCategory(cat)}
+                                            className={`flex flex-col items-center gap-2 p-2 rounded-xl transition-all ${isSelected ? 'bg-primary/10 scale-105 shadow-inner' : 'hover:bg-primary/5'
+                                                }`}
+                                        >
+                                            <div className={`w-12 h-12 rounded-full flex items-center justify-center transition-transform ${isSelected
+                                                ? type === 'income' ? 'bg-primary text-surface' : 'bg-secondary text-surface'
+                                                : 'bg-surface text-muted border-2 border-muted'
+                                                }`}>
+                                                <Icon className="w-6 h-6" />
+                                            </div>
+                                            <span className={`text-xs font-medium ${isSelected ? 'text-primary' : 'text-muted'
+                                                }`}>
+                                                {cat.name}
+                                            </span>
+                                        </button>
+                                    )
+                                })}
+                            </div>
+                        )}
                     </div>
 
                     {/* Date & Note */}

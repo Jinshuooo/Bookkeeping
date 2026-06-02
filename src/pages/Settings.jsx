@@ -1,16 +1,29 @@
 import { useState } from 'react'
 import { useAuth } from '../contexts/AuthContext'
 import { useLedger } from '../contexts/LedgerContext'
-import { User, Shield, Github, HelpCircle, Download, FileSpreadsheet, Loader2 } from 'lucide-react'
+import { User, Shield, Github, HelpCircle, Download, FileSpreadsheet, Loader2, Tags } from 'lucide-react'
 import { supabase } from '../lib/supabase'
 import ExcelJS from 'exceljs'
 import { format } from 'date-fns'
 import ExportDialog from '../components/ExportDialog'
+import CategoryManager from '../components/CategoryManager'
+import { useCategories } from '../hooks/useCategories'
 
 export default function Settings() {
     const { user, signOut } = useAuth()
     const { ledgers } = useLedger()
     const [showExportDialog, setShowExportDialog] = useState(false)
+    const [showCategoryManager, setShowCategoryManager] = useState(false)
+
+    const {
+        categories,
+        loading: categoriesLoading,
+        createCategory,
+        updateCategory,
+        deleteCategory,
+        getCategoryTransactionCount,
+        batchReplaceCategory
+    } = useCategories()
 
     const handleExport = async ({ ledgerIds, startDate, endDate, timeRangeText }) => {
         try {
@@ -262,6 +275,21 @@ export default function Settings() {
                 <h3 className="text-lg font-bold text-primary px-2">数据管理</h3>
                 <div className="bg-surface border border-primary/10 rounded-2xl shadow-sm overflow-hidden">
                     <button
+                        onClick={() => setShowCategoryManager(true)}
+                        className="w-full p-4 flex items-center justify-between hover:bg-primary/5 transition-colors cursor-pointer text-left border-b border-primary/10"
+                    >
+                        <div className="flex items-center gap-3">
+                            <div className="p-2 bg-primary/10 text-primary rounded-lg">
+                                <Tags className="w-5 h-5" />
+                            </div>
+                            <div>
+                                <div className="font-medium text-primary">分类管理</div>
+                                <div className="text-xs text-muted">自定义收入与支出的分类及图标</div>
+                            </div>
+                        </div>
+                        <span className="text-muted text-sm">→</span>
+                    </button>
+                    <button
                         onClick={() => setShowExportDialog(true)}
                         className="w-full p-4 flex items-center justify-between hover:bg-primary/5 transition-colors cursor-pointer text-left"
                     >
@@ -290,7 +318,7 @@ export default function Settings() {
                             </div>
                             <span className="font-medium text-primary">关于应用</span>
                         </div>
-                        <span className="text-muted text-sm">v1.2.1</span>
+                        <span className="text-muted text-sm">v1.2.2</span>
                     </div>
 
                     <a
@@ -310,17 +338,24 @@ export default function Settings() {
                 </div>
             </div>
 
-            {/* Coming Soon */}
-            <div className="text-center pt-8">
-                <p className="text-muted/50 text-sm">
-                    更多功能（自定义分类...）正在开发中...
-                </p>
-            </div>
             {/* Export Dialog */}
             <ExportDialog
                 isOpen={showExportDialog}
                 onClose={() => setShowExportDialog(false)}
                 onExport={handleExport}
+            />
+
+            {/* Category Manager */}
+            <CategoryManager
+                isOpen={showCategoryManager}
+                onClose={() => setShowCategoryManager(false)}
+                categories={categories}
+                loading={categoriesLoading}
+                onCreateCategory={createCategory}
+                onUpdateCategory={updateCategory}
+                onDeleteCategory={deleteCategory}
+                getCategoryTransactionCount={getCategoryTransactionCount}
+                batchReplaceCategory={batchReplaceCategory}
             />
         </div>
     )

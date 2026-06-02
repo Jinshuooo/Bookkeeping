@@ -3,16 +3,39 @@ import { useAuth } from '../contexts/AuthContext'
 import { useLedger } from '../contexts/LedgerContext'
 import { supabase } from '../lib/supabase'
 import { format, isSameDay, parseISO, startOfMonth, subMonths, isSameMonth } from 'date-fns'
-import { ArrowDownCircle, Plus, Trash2, Search, MoreHorizontal } from 'lucide-react'
-import { getCategoryIcon } from '../lib/constants'
+import { ArrowDownCircle, Plus, Trash2, Search, MoreHorizontal, Pencil, X, AlertTriangle } from 'lucide-react'
+import { getCategoryIcon, getIconComponent } from '../lib/constants'
+import { useCategories } from '../hooks/useCategories'
+import { useSearchParams } from 'react-router-dom'
 
 export default function Transactions() {
     const { user } = useAuth()
     const { currentLedger } = useLedger()
+    const [searchParams, setSearchParams] = useSearchParams()
+    const { categories } = useCategories()
+
     const [transactions, setTransactions] = useState([])
     const [loading, setLoading] = useState(true)
-    const [searchTerm, setSearchTerm] = useState('')
+    const [searchTerm, setSearchTerm] = useState(() => searchParams.get('search') || '')
     const [selectedMonth, setSelectedMonth] = useState(new Date())
+    const [reclassifyMode, setReclassifyMode] = useState(false)
+    const [reclassifyCategory, setReclassifyCategory] = useState('')
+    const [editingId, setEditingId] = useState(null)
+    const [editCategory, setEditCategory] = useState('')
+    const [saving, setSaving] = useState(false)
+
+    // Handle reclassify mode from delete flow
+    useEffect(() => {
+        const searchFromParam = searchParams.get('search')
+        const action = searchParams.get('action')
+        if (searchFromParam && action === 'reclassify') {
+            setSearchTerm(searchFromParam)
+            setReclassifyMode(true)
+            setReclassifyCategory(searchFromParam)
+            // Clear the params from URL
+            setSearchParams({}, { replace: true })
+        }
+    }, [])
 
     useEffect(() => {
         if (!user) return
@@ -58,6 +81,67 @@ export default function Transactions() {
         } catch (error) {
             alert('删除失败: ' + error.message)
         }
+    }
+
+    const handleEditStart = (t) => {
+        setEditingId(t.id)
+        setEditCategory(t.category)
+    }
+
+    const handleEditCancel = () => {
+        setEditingId(null)
+        setEditCategory('')
+    }
+
+    const handleEditSave = async (id) => {
+        if (!editCategory.trim()) return
+        setSaving(true)
+        try {
+            const { error } = await supabase
+                .from('transactions')
+                .update({ category: editCategory.trim() })
+                .eq('id', id)
+
+            if (error) throw error
+
+            setTransactions(prev =>
+                prev.map(t => t.id === id ? { ...t, category: editCategory.trim() } : t)
+            )
+            setEditingId(null)
+            setEditCategory('')
+
+            // If in reclassify mode, check if all visible items are done
+            if (reclassifyMode) {
+                const { count, error: countError } = await supabase
+                    .from('transactions')
+                    .select('*', { count: 'exact', head: true })
+                    .eq('ledger_id', currentLedger.id)
+                    .eq('category', reclassifyCategory)
+
+                if (!countError && count === 0) {
+                    setReclassifyMode(false)
+                    setReclassifyCategory('')
+                    setSearchTerm('')
+                }
+            }
+        } catch (error) {
+            alert('保存失败: ' + error.message)
+        } finally {
+            setSaving(false)
+        }
+    }
+
+    const dismissReclassify = () => {
+        setReclassifyMode(false)
+        setReclassifyCategory('')
+        setSearchTerm('')
+    }
+
+    // Get available categories for the edit dropdown
+    const getAvailableCategories = (type) => {
+        return categories
+            .filter(c => c.type === type)
+            .map(c => c.name)
     }
 
     // Filter transactions first
@@ -145,6 +229,27 @@ export default function Transactions() {
                 </div>
             </div>
 
+            {/* Reclassify Banner */}
+            {reclassifyMode && (
+                <div className="bg-warning/10 border border-warning/20 rounded-2xl p-4 flex items-start gap-3">
+                    <AlertTriangle className="w-5 h-5 text-warning flex-shrink-0 mt-0.5" />
+                    <div className="flex-1">
+                        <p className="text-sm font-medium text-primary">
+                            请逐条修改以下「{reclassifyCategory}」分类的账单
+                        </p>
+                        <p className="text-xs text-muted mt-1">
+                            修改完毕后可返回设置页删除该分类
+                        </p>
+                    </div>
+                    <button
+                        onClick={dismissReclassify}
+                        className="p-1.5 hover:bg-primary/5 rounded-lg transition-colors"
+                    >
+                        <X className="w-4 h-4 text-muted" />
+                    </button>
+                </div>
+            )}
+
             {/* Search Summary */}
             {searchTerm && (
                 <div className="grid grid-cols-2 gap-4">
@@ -181,31 +286,79 @@ export default function Transactions() {
 
                             <div className="bg-surface border border-primary/10 rounded-2xl shadow-sm divide-y divide-primary/5 overflow-hidden">
                                 {groupedTransactions[date].map(t => {
-                                    const Icon = getCategoryIcon(t.type, t.category)
+                                    const Icon = getCategoryIcon(t.type, t.category, categories)
+                                    const isEditing = editingId === t.id
+                                    const availableCats = getAvailableCategories(t.type)
+
+                                    // If no categories yet — fallback
+                                    if (availableCats.length === 0) {
+                                        availableCats.push(t.category)
+                                    }
+
                                     return (
                                         <div key={t.id} className="group p-4 flex items-center justify-between hover:bg-primary/5 transition-colors">
-                                            <div className="flex items-center gap-4">
-                                                <div className={`w-10 h-10 rounded-full flex items-center justify-center ${t.type === 'income' ? 'bg-primary/10 text-primary' : 'bg-secondary/10 text-secondary'
+                                            <div className="flex items-center gap-4 flex-1 min-w-0">
+                                                <div className={`w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0 ${t.type === 'income' ? 'bg-primary/10 text-primary' : 'bg-secondary/10 text-secondary'
                                                     }`}>
                                                     <Icon className="w-5 h-5" />
                                                 </div>
-                                                <div>
-                                                    <div className="font-medium text-primary">{t.category}</div>
-                                                    <div className="text-xs text-muted">{t.note || '无备注'}</div>
+                                                <div className="min-w-0 flex-1">
+                                                    {isEditing ? (
+                                                        <select
+                                                            value={editCategory}
+                                                            onChange={(e) => setEditCategory(e.target.value)}
+                                                            className="w-full px-2 py-1 rounded-lg bg-background border border-primary/10 text-sm font-medium text-primary outline-none focus:border-primary/30"
+                                                        >
+                                                            {availableCats.map(catName => (
+                                                                <option key={catName} value={catName}>{catName}</option>
+                                                            ))}
+                                                        </select>
+                                                    ) : (
+                                                        <div className="font-medium text-primary truncate">{t.category}</div>
+                                                    )}
+                                                    <div className="text-xs text-muted truncate">{t.note || '无备注'}</div>
                                                 </div>
                                             </div>
-                                            <div className="flex items-center gap-4">
+                                            <div className="flex items-center gap-2 flex-shrink-0">
                                                 <div className={`font-bold ${t.type === 'income' ? 'text-primary' : 'text-secondary'
                                                     }`}>
                                                     {t.type === 'income' ? '+' : '-'} {t.amount.toFixed(2)}
                                                 </div>
-                                                <button
-                                                    onClick={() => handleDelete(t.id)}
-                                                    className="opacity-0 group-hover:opacity-100 p-2 text-muted hover:text-error transition-all"
-                                                    title="删除"
-                                                >
-                                                    <Trash2 className="w-4 h-4" />
-                                                </button>
+                                                {isEditing ? (
+                                                    <div className="flex gap-1">
+                                                        <button
+                                                            onClick={() => handleEditSave(t.id)}
+                                                            disabled={saving}
+                                                            className="p-1.5 text-success hover:bg-success/10 rounded-lg transition-colors text-xs font-medium"
+                                                        >
+                                                            {saving ? '...' : '保存'}
+                                                        </button>
+                                                        <button
+                                                            onClick={handleEditCancel}
+                                                            disabled={saving}
+                                                            className="p-1.5 text-muted hover:text-error rounded-lg transition-colors"
+                                                        >
+                                                            <X className="w-4 h-4" />
+                                                        </button>
+                                                    </div>
+                                                ) : (
+                                                    <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                                                        <button
+                                                            onClick={() => handleEditStart(t)}
+                                                            className="p-1.5 text-muted hover:text-primary rounded-lg transition-colors"
+                                                            title="编辑分类"
+                                                        >
+                                                            <Pencil className="w-3.5 h-3.5" />
+                                                        </button>
+                                                        <button
+                                                            onClick={() => handleDelete(t.id)}
+                                                            className="p-1.5 text-muted hover:text-error rounded-lg transition-colors"
+                                                            title="删除"
+                                                        >
+                                                            <Trash2 className="w-3.5 h-3.5" />
+                                                        </button>
+                                                    </div>
+                                                )}
                                             </div>
                                         </div>
                                     )

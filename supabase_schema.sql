@@ -85,6 +85,21 @@ begin
     end if;
 end $$;
 
+-- Categories (Customizable by ledger members)
+create table if not exists public.categories (
+  id uuid default uuid_generate_v4() primary key,
+  ledger_id uuid references public.ledgers on delete cascade not null,
+  user_id uuid references auth.users not null,
+  type text not null check (type in ('income', 'expense')),
+  name text not null,
+  icon text not null,
+  sort_order integer default 0,
+  is_default boolean default false,
+  created_at timestamp with time zone default timezone('utc'::text, now()) not null,
+  unique(ledger_id, type, name)
+);
+alter table public.categories enable row level security;
+
 -- ==========================================
 -- 3. RLS Policies
 -- ==========================================
@@ -169,12 +184,29 @@ drop policy if exists "Users can delete transactions in their ledgers" on public
 create policy "Users can delete transactions in their ledgers" on public.transactions for delete
   using ( public.is_ledger_member(ledger_id) );
 
+-- Categories
+drop policy if exists "Ledger members can view categories" on public.categories;
+create policy "Ledger members can view categories" on public.categories for select
+  using ( public.is_ledger_member(ledger_id) );
+
+drop policy if exists "Ledger members can insert categories" on public.categories;
+create policy "Ledger members can insert categories" on public.categories for insert
+  with check ( public.is_ledger_member(ledger_id) );
+
+drop policy if exists "Ledger members can update categories" on public.categories;
+create policy "Ledger members can update categories" on public.categories for update
+  using ( public.is_ledger_member(ledger_id) );
+
+drop policy if exists "Ledger members can delete non-default categories" on public.categories;
+create policy "Ledger members can delete non-default categories" on public.categories for delete
+  using ( public.is_ledger_member(ledger_id) AND is_default = false );
+
 
 -- ==========================================
 -- 4. Triggers & RPCs
 -- ==========================================
 
--- Profile Creation Trigger (Enhanced)
+-- Profile Creation Trigger (Enhanced with default categories)
 create or replace function public.handle_new_user()
 returns trigger as $$
 declare
@@ -194,6 +226,28 @@ begin
       -- 3. Add Member (Owner)
       insert into public.ledger_members (ledger_id, user_id, role)
       values (new_ledger_id, new.id, 'owner');
+
+      -- 4. Insert Default Categories
+      -- Default expense categories
+      insert into public.categories (ledger_id, user_id, type, name, icon, sort_order, is_default) values
+      (new_ledger_id, new.id, 'expense', '餐饮', 'Utensils', 10, true),
+      (new_ledger_id, new.id, 'expense', '交通', 'Bus', 9, true),
+      (new_ledger_id, new.id, 'expense', '购物', 'ShoppingBag', 8, true),
+      (new_ledger_id, new.id, 'expense', '居住', 'Home', 7, true),
+      (new_ledger_id, new.id, 'expense', '水电', 'Zap', 6, true),
+      (new_ledger_id, new.id, 'expense', '娱乐', 'Gamepad2', 5, true),
+      (new_ledger_id, new.id, 'expense', '教育', 'GraduationCap', 4, true),
+      (new_ledger_id, new.id, 'expense', '医疗', 'Stethoscope', 3, true),
+      (new_ledger_id, new.id, 'expense', '旅行', 'Plane', 2, true),
+      (new_ledger_id, new.id, 'expense', '其他', 'MoreHorizontal', 1, true);
+      -- Default income categories
+      insert into public.categories (ledger_id, user_id, type, name, icon, sort_order, is_default) values
+      (new_ledger_id, new.id, 'income', '工资', 'Wallet', 6, true),
+      (new_ledger_id, new.id, 'income', '奖金', 'DollarSign', 5, true),
+      (new_ledger_id, new.id, 'income', '理财', 'TrendingUp', 4, true),
+      (new_ledger_id, new.id, 'income', '礼金', 'Gift', 3, true),
+      (new_ledger_id, new.id, 'income', '固收', 'Briefcase', 2, true),
+      (new_ledger_id, new.id, 'income', '其他收入', 'MoreHorizontal', 1, true);
   end if;
 
   return new;
@@ -205,7 +259,7 @@ create trigger on_auth_user_created
   after insert on auth.users
   for each row execute procedure public.handle_new_user();
 
--- Atomic Ledger Creation RPC
+-- Atomic Ledger Creation RPC (with default categories)
 -- Drop old signature if exists to allow cleaner rename
 drop function if exists public.create_ledger(text);
 
@@ -219,12 +273,34 @@ begin
   insert into public.ledgers (name, created_by)
   values (new_ledger_name, auth.uid())
   returning id, name, created_at, created_by into new_ledger_record;
-  
+
   new_ledger_id := new_ledger_record.id;
 
   -- 2. Insert Member (Owner)
   insert into public.ledger_members (ledger_id, user_id, role)
   values (new_ledger_id, auth.uid(), 'owner');
+
+  -- 3. Insert Default Categories
+  -- Default expense categories
+  insert into public.categories (ledger_id, user_id, type, name, icon, sort_order, is_default) values
+  (new_ledger_id, auth.uid(), 'expense', '餐饮', 'Utensils', 10, true),
+  (new_ledger_id, auth.uid(), 'expense', '交通', 'Bus', 9, true),
+  (new_ledger_id, auth.uid(), 'expense', '购物', 'ShoppingBag', 8, true),
+  (new_ledger_id, auth.uid(), 'expense', '居住', 'Home', 7, true),
+  (new_ledger_id, auth.uid(), 'expense', '水电', 'Zap', 6, true),
+  (new_ledger_id, auth.uid(), 'expense', '娱乐', 'Gamepad2', 5, true),
+  (new_ledger_id, auth.uid(), 'expense', '教育', 'GraduationCap', 4, true),
+  (new_ledger_id, auth.uid(), 'expense', '医疗', 'Stethoscope', 3, true),
+  (new_ledger_id, auth.uid(), 'expense', '旅行', 'Plane', 2, true),
+  (new_ledger_id, auth.uid(), 'expense', '其他', 'MoreHorizontal', 1, true);
+  -- Default income categories
+  insert into public.categories (ledger_id, user_id, type, name, icon, sort_order, is_default) values
+  (new_ledger_id, auth.uid(), 'income', '工资', 'Wallet', 6, true),
+  (new_ledger_id, auth.uid(), 'income', '奖金', 'DollarSign', 5, true),
+  (new_ledger_id, auth.uid(), 'income', '理财', 'TrendingUp', 4, true),
+  (new_ledger_id, auth.uid(), 'income', '礼金', 'Gift', 3, true),
+  (new_ledger_id, auth.uid(), 'income', '固收', 'Briefcase', 2, true),
+  (new_ledger_id, auth.uid(), 'income', '其他收入', 'MoreHorizontal', 1, true);
 
   return row_to_json(new_ledger_record);
 end;
@@ -239,3 +315,38 @@ insert into public.profiles (id, email)
 select id, email from auth.users
 on conflict (id) do nothing;
 
+-- Backfill default categories for existing ledgers that have none
+do $$
+declare
+  ledger_record record;
+begin
+  for ledger_record in
+    select l.id, l.created_by
+    from public.ledgers l
+    where not exists (
+      select 1 from public.categories c where c.ledger_id = l.id
+    )
+  loop
+    -- Insert default expense categories
+    insert into public.categories (ledger_id, user_id, type, name, icon, sort_order, is_default) values
+    (ledger_record.id, ledger_record.created_by, 'expense', '餐饮', 'Utensils', 10, true),
+    (ledger_record.id, ledger_record.created_by, 'expense', '交通', 'Bus', 9, true),
+    (ledger_record.id, ledger_record.created_by, 'expense', '购物', 'ShoppingBag', 8, true),
+    (ledger_record.id, ledger_record.created_by, 'expense', '居住', 'Home', 7, true),
+    (ledger_record.id, ledger_record.created_by, 'expense', '水电', 'Zap', 6, true),
+    (ledger_record.id, ledger_record.created_by, 'expense', '娱乐', 'Gamepad2', 5, true),
+    (ledger_record.id, ledger_record.created_by, 'expense', '教育', 'GraduationCap', 4, true),
+    (ledger_record.id, ledger_record.created_by, 'expense', '医疗', 'Stethoscope', 3, true),
+    (ledger_record.id, ledger_record.created_by, 'expense', '旅行', 'Plane', 2, true),
+    (ledger_record.id, ledger_record.created_by, 'expense', '其他', 'MoreHorizontal', 1, true);
+    -- Insert default income categories
+    insert into public.categories (ledger_id, user_id, type, name, icon, sort_order, is_default) values
+    (ledger_record.id, ledger_record.created_by, 'income', '工资', 'Wallet', 6, true),
+    (ledger_record.id, ledger_record.created_by, 'income', '奖金', 'DollarSign', 5, true),
+    (ledger_record.id, ledger_record.created_by, 'income', '理财', 'TrendingUp', 4, true),
+    (ledger_record.id, ledger_record.created_by, 'income', '礼金', 'Gift', 3, true),
+    (ledger_record.id, ledger_record.created_by, 'income', '固收', 'Briefcase', 2, true),
+    (ledger_record.id, ledger_record.created_by, 'income', '其他收入', 'MoreHorizontal', 1, true);
+  end loop;
+end;
+$$;
