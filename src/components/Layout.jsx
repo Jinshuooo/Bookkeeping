@@ -1,5 +1,5 @@
 import { Outlet, Link, useLocation } from 'react-router-dom'
-import { LayoutDashboard, PlusCircle, List, Settings, LogOut } from 'lucide-react'
+import { LayoutDashboard, PlusCircle, List, Settings, LogOut, TrendingUp } from 'lucide-react'
 import { useAuth } from '../contexts/AuthContext'
 import LedgerSwitcher from './LedgerSwitcher'
 
@@ -11,6 +11,7 @@ export default function Layout() {
         { name: '仪表盘', href: '/', icon: LayoutDashboard },
         { name: '记一笔', href: '/add', icon: PlusCircle },
         { name: '明细', href: '/transactions', icon: List },
+        { name: '黄金理财', href: '/gold', icon: TrendingUp },
         { name: '设置', href: '/settings', icon: Settings },
     ]
 

@@ -18,6 +18,8 @@ import Transactions from './pages/Transactions'
 
 import Settings from './pages/Settings'
 
+import GoldInvestment from './pages/GoldInvestment'
+
 function App() {
     return (
         <AuthProvider>
@@ -35,6 +37,7 @@ function App() {
                             <Route path="add" element={<AddTransaction />} />
                             <Route path="transactions" element={<Transactions />} />
                             <Route path="settings" element={<Settings />} />
+                            <Route path="gold" element={<GoldInvestment />} />
                         </Route>
                         <Route path="*" element={<Navigate to="/" replace />} />
                     </Routes>
